@@ -4,13 +4,19 @@ if [[ -n "$_TERRAFORM_SH_INCLUDED" ]]; then
 fi
 _TERRAFORM_SH_INCLUDED=1
 
+# absolute path to root folder
+if [[ "${FOLDER_bash}" == "" ]]; then
+    echo "FOLDER_bash not set"
+    exit 1
+fi
+
 # includes
 # ########
 
-source sanity.sh
-source logging.sh
-source files.sh
-source azure.sh
+source "${FOLDER_bash}/sanity.sh"
+source "${FOLDER_bash}/logging.sh"
+source "${FOLDER_bash}/files.sh"
+source "${FOLDER_bash}/azure.sh"
 
 # functions
 # #########
