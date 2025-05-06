@@ -128,7 +128,7 @@ function azure_create_sa_container() {
 
     { \
         [[ ${sa_name} != "" ]] && \
-        [[ ${sa_container_name} != "" ]] && \
+        [[ ${sa_container_name} != "" ]] \
     } || { log_error "Function argument missing"; }
 
     local sa_container_name_found=$(az storage container list --account-name ${sa_name} --auth-mode login |jq ".[] | select(.name == \"${sa_container_name}\")")
