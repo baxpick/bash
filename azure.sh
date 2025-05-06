@@ -79,12 +79,12 @@ function azure_create_sa() {
 
     # ...create resource otherwise
     run az storage account create \
-        --resource-group ${rg} \
+        --resource-group "${rg}" \
         --location "${location}" \
-        --name ${sa_name} \
+        --name "${sa_name}" \
         --sku "${sa_sku}" \
         --access-tier "${sa_tier}" \
-        --allow-blob-public-access ${sa_public}
+        --allow-blob-public-access "${sa_public}"
 
     log_info "Storage account '${sa_name}' created successfully"
 }
@@ -107,13 +107,13 @@ function azure_create_sa_container() {
         { log_info "Storage account container '${sa_container_name}' already created"; return; }
 
     # ...create resource otherwise
-    local key=$(az storage account keys list --account-name ${sa_name} --query '[0].value' -o tsv)
+    local key=$(az storage account keys list --account-name "${sa_name}" --query '[0].value' -o tsv)
     [[ ${key} != "" ]] || { errorout "Storage account key not found"; }
 
     run az storage container create \
-        --name ${sa_container_name} \
-        --account-name ${sa_name} \        
-        --account-key ${key}
+        --name "${sa_container_name}" \
+        --account-name "${sa_name}" \
+        --account-key "${key}"
 
     log_info "Storage account container '${sa_container_name}' created successfully"
 }
