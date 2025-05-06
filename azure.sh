@@ -92,7 +92,7 @@ function azure_create_sa() {
         [[ ${location} != "" ]] && \
         [[ ${sa_name} != "" ]] && \
         [[ ${sa_sku} != "" ]] && \
-        [[ ${sa_tier} != "" ]] \
+        [[ ${sa_tier} != "" ]] && \
         [[ ${sa_public} != "" ]] \
     } || { log_error "Function argument missing"; }
 
