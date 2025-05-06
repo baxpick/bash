@@ -1,2 +1,17 @@
-# bash
-Some bash code snippets which can be re-used as submodule in other repos
+# Introduction
+
+This repo contains commonly used bash scripts and code snippets.
+
+For example if you want to use snippets related to docker, include this in your script:
+
+```bash
+source path/to/docker.sh
+```
+
+and you can execute, for example:
+
+```bash
+docker_restart --cpu 4 --memory 8
+```
+
+ to restart docker to use 4 CPU cores and 8 GB of RAM.
