@@ -19,6 +19,31 @@ ensure_command jq
 # functions
 # #########
 
+function azure_login() {
+
+    log_info "Logging in to Azure..."
+
+    local CLIENT_ID=${1}
+    local CLIENT_SECRET=${2}
+    local TENANT_ID=${3}
+
+    { \
+        [[ ${CLIENT_ID} != "" ]] && \
+        [[ ${CLIENT_SECRET} != "" ]] && \
+        [[ ${TENANT_ID} != "" ]] \
+    } || { log_error "Function argument missing"; }
+
+    ensure_command "az"
+
+    if ! az account show >/dev/null 2>&1; then
+        az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID} >/dev/null 2>&1
+    fi
+
+    az account show >/dev/null 2>&1 || { errorout "You are not signed in to Azure"; }
+
+    log_info "Logged in to Azure successfully"
+}
+
 function azure_create_rg() {
 
     log_info "Create resource group..."
