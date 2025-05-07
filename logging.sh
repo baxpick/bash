@@ -20,13 +20,13 @@ source "${FOLDER_bash}/sanity.sh"
 
 function log_error() {
     [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
-    (echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    (echo "🧨[$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
     exit 255
 }
 
 function log_error_no_exit() {
     [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
-    (echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    (echo "🧨[$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
     return 255
 }
 
@@ -43,8 +43,10 @@ function log_info() {
 function log_title() {
     [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)    
     (\
+        echo >&2 && \
         echo "${1}" >&2 && \
-        echo "$(printf "%0.s=" {1..80})" >&2 \
+        echo "$(printf "%0.s=" {1..80})" >&2 && \
+        echo >&2 \
     )
 }
 
@@ -60,9 +62,11 @@ _log_box() {
     local border=$(printf "${frameChar}%.0s" $(seq 1 ${border_length}))
 
     [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
+    echo >&2
     echo "$border"  >&2
     echo "${frameChar}${content}${frameChar}" >&2
     echo "$border" >&2
+    echo >&2
 }
 
 function log_box() {
