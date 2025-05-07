@@ -45,7 +45,7 @@ function azure_login() {
         az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID} >/dev/null 2>&1
     fi
 
-    run az account show || { log_error "You are not signed in to Azure"; }
+    az account show || { log_error "You are not signed in to Azure"; }
 
     log_info "Logged in to Azure successfully"
 }
