@@ -90,9 +90,9 @@ function run() {
         exit 255
     fi
 
-    if [[ "${result}" != *$'\n' ]]; then
-        result+=$'\n'
+    if [[ -n "${result}" ]]; then
+        # ensure single trailing newline
+        [[ "${result}" != *$'\n' ]] && result+=$'\n'
+        printf '%s' "${result}"
     fi
-
-    printf '%s' "${result}"
 }
