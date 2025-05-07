@@ -54,6 +54,7 @@ function terraform_run() {
   log_title "Terraform run"
 
   # defaults
+  local folder=""
   local environment=""
   local action=""
   local FILE_variables=""
@@ -63,6 +64,11 @@ function terraform_run() {
   while [[ $# -gt 0 ]]; do
       key="$1"
       case $key in
+          --folder)
+          folder="$2"
+          shift
+          shift
+          ;;      
           --environment)
           environment="$2"
           shift
@@ -86,27 +92,22 @@ function terraform_run() {
       esac
   done
 
-  # log
-  log_info "[LOG] Current working directory: '$(pwd)'"
-
-  log_info "[LOG] Environment: ${environment}"
-  log_info "[LOG] Action: ${action}"
-  log_info "[LOG] File variables: ${FILE_variables}"
-  log_info "[LOG] File variables backend: ${FILE_variables_backend}"
-  (echo >&2)
-
   # sanity
   log_info "Sanity check..."
   ensure_command terraform
   ensure_file "main.tf"
 
   { \
-      [[ "${environment}" != "" ]] && \
-      [[ "${action}" != "" ]] && \
-      [[ "${FILE_variables}" != "" ]] && \
-      [[ "${FILE_variables_backend}" != "" ]] \
+    [[ "${folder}" != "" ]] && \
+    [[ "${environment}" != "" ]] && \
+    [[ "${action}" != "" ]] && \
+    [[ "${FILE_variables}" != "" ]] && \
+    [[ "${FILE_variables_backend}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
+  ensure_folder "${folder}"
+  cd "${folder}" > /dev/null 2>&1
+
   declare -a VALID_ENVIRONMENTS=("dev" "prod")
   if [[ ! " ${VALID_ENVIRONMENTS[@]} " =~ " ${environment} " ]]; then
     log_error "Invalid environment '${environment}'"
@@ -121,6 +122,15 @@ function terraform_run() {
   ensure_file "${FILE_variables_backend}"
   log_info "Sanity check completed successfully\n"
 
+  # log
+  log_info "[LOG] Current working directory: '$(pwd)'"
+
+  log_info "[LOG] Folder: ${folder}"
+  log_info "[LOG] Environment: ${environment}"
+  log_info "[LOG] Action: ${action}"
+  log_info "[LOG] File variables: ${FILE_variables}"
+  log_info "[LOG] File variables backend: ${FILE_variables_backend}\n"
+  
   # cleanup
   log_info "Cleanup..."
   rm -rf .terraform* 2>/dev/null
@@ -181,5 +191,6 @@ function terraform_run() {
     log_info "Apply completed successfully\n"
   fi
 
+  cd - > /dev/null 2>&1
   log_info "Terraform run completed successfully\n"
 }
