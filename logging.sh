@@ -73,17 +73,34 @@ function log_box() {
 # NOTE: use with caution, might not be sutable for all use-cases!
 function run() {
     [[ "${1}" != "" ]] || log_error "empty argument"
-    
     ensure_command date
 
-    (echo "🚀[$(date "+%Y-%m-%dT%H:%M:%S%z")] $@" >&2)
+    # build a copy of "$@" for logging, but mask sensitive values
+    local log_args=()
+    local mask_next=false
+    for arg in "$@"; do
+        if $mask_next; then
+            log_args+=( '...' )
+            mask_next=false
+            continue
+        fi
+        if [[ "$arg" == "--account-key" ]]; then
+            log_args+=( "$arg" )
+            mask_next=true
+        else
+            log_args+=( "$arg" )
+        fi
+    done
 
-    local result=""
+    # log the (possibly masked) command
+    ( echo "🚀[$(date "+%Y-%m-%dT%H:%M:%S%z")] ${log_args[*]}" >&2 )
 
+    # actually run the real command with full args
+    local result
     if [[ "${LOG_VERBOSE}" == "YES" ]]; then
-        result=$("$@")
+        result=$( "$@" )
     else
-        result=$("$@" >/dev/null 2>&1)
+        result=$( "$@" >/dev/null 2>&1 )
     fi
 
     if [[ $? -ne 0 ]]; then
