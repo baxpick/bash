@@ -58,7 +58,7 @@ function azure_create_rg() {
     local location=${2}
 
     { \
-        [[ ${rg} != "" ]] && \
+        [[ "${rg}" != "" ]] && \
         [[ "${location}" != "" ]] \
     } || { log_error "Function argument missing"; }
 
@@ -88,12 +88,12 @@ function azure_create_sa() {
     local sa_public=${6}
 
     { \
-        [[ ${rg} != "" ]] && \
-        [[ ${location} != "" ]] && \
-        [[ ${sa_name} != "" ]] && \
-        [[ ${sa_sku} != "" ]] && \
-        [[ ${sa_tier} != "" ]] && \
-        [[ ${sa_public} != "" ]] \
+        [[ "${rg}" != "" ]] && \
+        [[ "${location}" != "" ]] && \
+        [[ "${sa_name}" != "" ]] && \
+        [[ "${sa_sku}" != "" ]] && \
+        [[ "${sa_tier}" != "" ]] && \
+        [[ "${sa_public}" != "" ]] \
     } || { log_error "Function argument missing"; }
 
     # check Microsoft.Storage registration
