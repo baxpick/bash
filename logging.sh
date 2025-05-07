@@ -67,7 +67,7 @@ function run() {
     
     ensure_command date "+%Y-%m-%dT%H:%M:%S%z"
 
-    (echo "[run] [$(date "+%Y-%m-%dT%H:%M:%S%z")] $@" >&2)
+    (echo "🚀 [$(date "+%Y-%m-%dT%H:%M:%S%z")] $@" >&2)
 
     local result=""
 

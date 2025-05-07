@@ -45,7 +45,7 @@ function azure_login() {
         az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID} >/dev/null 2>&1
     fi
 
-    az account show >/dev/null 2>&1 || { errorout "You are not signed in to Azure"; }
+    run az account show || { log_error "You are not signed in to Azure"; }
 
     log_info "Logged in to Azure successfully"
 }
@@ -139,7 +139,7 @@ function azure_create_sa_container() {
 
     # ...create resource otherwise
     local key=$(az storage account keys list --account-name "${sa_name}" --query '[0].value' -o tsv)
-    [[ ${key} != "" ]] || { errorout "Storage account key not found"; }
+    [[ ${key} != "" ]] || { log_error "Storage account key not found"; }
 
     run az storage container create \
         --name "${sa_container_name}" \
