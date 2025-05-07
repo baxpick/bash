@@ -51,7 +51,7 @@ function terraform_backend_create() {
 # wraps terraform commands
 function terraform_run() {
 
-  log_info "Terraform run..."
+  log_title "Terraform run"
 
   # defaults
   local environment=""
