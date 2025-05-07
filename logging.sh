@@ -19,16 +19,16 @@ source "${FOLDER_bash}/sanity.sh"
 # #########
 
 function log_error() {
-    (echo >&2 && echo "[ERROR] [$(date)] ${1}" >&2)
+    (echo >&2 && echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
     exit 255
 }
 
 function log_warning() {
-    (echo >&2 && echo "[WARNING] [$(date)] ${1}" >&2)
+    (echo >&2 && echo "⚠️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
 
 function log_info() {
-    (echo >&2 && echo "[INFO] [$(date)] ${1}" >&2)
+    (echo >&2 && echo "ℹ️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
 
 function log_title() {
@@ -65,9 +65,9 @@ function log_box() {
 function run() {
     [[ "${1}" != "" ]] || log_error "empty argument"
     
-    ensure_command date
+    ensure_command date "+%Y-%m-%dT%H:%M:%S%z"
 
-    (echo "[run] [$(date)] $@" >&2)
+    (echo "[run] [$(date "+%Y-%m-%dT%H:%M:%S%z")] $@" >&2)
 
     local result=""
 
