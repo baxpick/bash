@@ -23,6 +23,11 @@ function log_error() {
     exit 255
 }
 
+function log_error_no_exit() {
+    (echo >&2 && echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    return 255
+}
+
 function log_warning() {
     (echo >&2 && echo "⚠️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
