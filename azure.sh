@@ -59,7 +59,7 @@ function azure_create_rg() {
 
     { \
         [[ ${rg} != "" ]] && \
-        [[ ${location} != "" ]] \
+        [[ "${location}" != "" ]] \
     } || { log_error "Function argument missing"; }
 
     local rg_found=$(az group list |jq -r ".[] | select(.name == \"${rg}\") | .id")
