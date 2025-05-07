@@ -33,14 +33,17 @@ function terraform_backend_create() {
   local rg=$(value_from ${FILE_variables_backend} resource_group_name)
   local location=$(value_from ${FILE_variables_backend} location)
   azure_create_rg "${rg}" "${location}"
+  (echo >&2)
 
   # backend storage account
   local sa_name=$(value_from ${FILE_variables_backend} storage_account_name)
   azure_create_sa "${rg}" "${location}" "${sa_name}" "Standard_LRS" "Cool" "true"
+  (echo >&2)
 
   # backend storage account container
   local sa_container_name=$(value_from ${FILE_variables_backend} container_name)
   azure_create_sa_container "${sa_name}" "${sa_container_name}"
+  (echo >&2)
 
   log_info "Terraform backend created successfully"
 }
