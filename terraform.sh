@@ -107,7 +107,7 @@ function terraform_run() {
   ensure_folder "${folder}"
   cd "${folder}" > /dev/null 2>&1
   ensure_file "main.tf"
-  
+
   declare -a VALID_ENVIRONMENTS=("dev" "prod")
   if [[ ! " ${VALID_ENVIRONMENTS[@]} " =~ " ${environment} " ]]; then
     log_error "Invalid environment '${environment}'"
@@ -120,7 +120,8 @@ function terraform_run() {
 
   ensure_file "${FILE_variables}"
   ensure_file "${FILE_variables_backend}"
-  log_info "Sanity check completed successfully\n"
+  log_info "Sanity check completed successfully"
+  (echo >&2)
 
   # log
   log_info "[LOG] Current working directory: '$(pwd)'"
@@ -129,13 +130,15 @@ function terraform_run() {
   log_info "[LOG] Environment: ${environment}"
   log_info "[LOG] Action: ${action}"
   log_info "[LOG] File variables: ${FILE_variables}"
-  log_info "[LOG] File variables backend: ${FILE_variables_backend}\n"
+  log_info "[LOG] File variables backend: ${FILE_variables_backend}"
+  (echo >&2)
   
   # cleanup
   log_info "Cleanup..."
   rm -rf .terraform* 2>/dev/null
   rm "${environment}.plan" 2>/dev/null
-  log_info "Cleanup completed successfully\n"
+  log_info "Cleanup completed successfully"
+  (echo >&2)
 
   # init
   log_info "Initialize..."
@@ -145,12 +148,14 @@ function terraform_run() {
     -var "action=${action}" \
     -var-file="${FILE_variables}" \
     -backend-config="${FILE_variables_backend}"
-  log_info "Initialize completed successfully\n"
+  log_info "Initialize completed successfully"
+  (echo >&2)
 
   # validate
   log_info "Validate..."
   run terraform validate
-  log_info "Validate completed successfully\n"
+  log_info "Validate completed successfully"
+  (echo >&2)
 
   # refresh
   log_info "Refresh..."
@@ -159,7 +164,8 @@ function terraform_run() {
     -var "action=${action}" \  
     -input=false \
     -var-file="${FILE_variables}"
-  log_info "Refresh completed successfully\n"
+  log_info "Refresh completed successfully"
+  (echo >&2)
 
   # early exit on delete
   if [[ ${action} == "resourcesDelete" ]]; then
@@ -168,7 +174,8 @@ function terraform_run() {
         -var "environment=${environment}" \
         -var "action=${action}" \
         -var-file="${FILE_variables}"
-    log_info "Destroy completed successfully\n"
+    log_info "Destroy completed successfully"
+    (echo >&2)
     return 0
   fi
 
@@ -181,16 +188,19 @@ function terraform_run() {
       -input=false \
       -var-file="${FILE_variables}" \
       -out "${environment}.plan"
-    log_info "Plan completed successfully\n"
+    log_info "Plan completed successfully"
+    (echo >&2)
 
     log_info "Apply..."
     run terraform apply \
       -auto-approve \
       -input=false \
       "${environment}.plan"
-    log_info "Apply completed successfully\n"
+    log_info "Apply completed successfully"
+    (echo >&2)
   fi
 
   cd - > /dev/null 2>&1
-  log_info "Terraform run completed successfully\n"
+  log_info "Terraform run completed successfully"
+  (echo >&2)
 }
