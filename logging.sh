@@ -19,27 +19,33 @@ source "${FOLDER_bash}/sanity.sh"
 # #########
 
 function log_error() {
-    (echo >&2 && echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
+    (echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
     exit 255
 }
 
 function log_error_no_exit() {
-    (echo >&2 && echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
+    (echo "🧨 [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
     return 255
 }
 
 function log_warning() {
-    (echo >&2 && echo "⚠️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
+    (echo "⚠️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
 
 function log_info() {
-    (echo >&2 && echo "ℹ️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
+    (echo "ℹ️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
 
 function log_title() {
-    (echo >&2 && \
-    echo "${1}" >&2 && \
-    echo "$(printf "%0.s=" {1..80})" >&2)
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)    
+    (\
+        echo "${1}" >&2 && \
+        echo "$(printf "%0.s=" {1..80})" >&2 \
+    )
 }
 
 _log_box() {
@@ -53,7 +59,7 @@ _log_box() {
     local border_length=$(( (content_length + 2) ))
     local border=$(printf "${frameChar}%.0s" $(seq 1 ${border_length}))
 
-    echo >&2
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
     echo "$border"  >&2
     echo "${frameChar}${content}${frameChar}" >&2
     echo "$border" >&2
@@ -70,8 +76,9 @@ function log_box() {
 function run() {
     [[ "${1}" != "" ]] || log_error "empty argument"
     
-    ensure_command date "+%Y-%m-%dT%H:%M:%S%z"
+    ensure_command date
 
+    [[ "${LOG_VERBOSE}" == "YES" ]] && (echo >&2)
     (echo "🚀[$(date "+%Y-%m-%dT%H:%M:%S%z")] $@" >&2)
 
     local result=""
@@ -83,7 +90,7 @@ function run() {
     fi
 
     if [[ $? -ne 0 ]]; then
-        exit 1
+        exit 255
     fi
 
     printf "${result}"
