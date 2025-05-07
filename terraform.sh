@@ -95,8 +95,7 @@ function terraform_run() {
   # sanity
   log_info "Sanity check..."
   ensure_command terraform
-  ensure_file "main.tf"
-
+  
   { \
     [[ "${folder}" != "" ]] && \
     [[ "${environment}" != "" ]] && \
@@ -107,7 +106,8 @@ function terraform_run() {
   
   ensure_folder "${folder}"
   cd "${folder}" > /dev/null 2>&1
-
+  ensure_file "main.tf"
+  
   declare -a VALID_ENVIRONMENTS=("dev" "prod")
   if [[ ! " ${VALID_ENVIRONMENTS[@]} " =~ " ${environment} " ]]; then
     log_error "Invalid environment '${environment}'"
