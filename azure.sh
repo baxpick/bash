@@ -96,11 +96,18 @@ function azure_create_sa() {
         [[ ${sa_public} != "" ]] \
     } || { log_error "Function argument missing"; }
 
-    run az provider register \
-        --namespace 'Microsoft.Storage' \
-        --wait \
-        --consent-to-permissions
-    log_info "Provider registered successfully"
+    # check Microsoft.Storage registration
+    state=$(az provider show --namespace Microsoft.Storage --query registrationState -o tsv)
+    if [ "$state" != "Registered" ]; then
+        log_info "Registering Microsoft.Storage (current state: $state)"
+        az provider register \
+            --namespace Microsoft.Storage \
+            --wait \
+            --consent-to-permissions
+        log_info "Microsoft.Storage registered successfully"
+    else
+        log_info "Microsoft.Storage already registered"
+    fi
 
     local sa_name_found=$(az storage account list |jq -r ".[] | select(.name == \"${sa_name}\") | .id")
     
