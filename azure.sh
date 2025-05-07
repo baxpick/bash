@@ -46,7 +46,6 @@ function azure_login() {
     fi
 
     run az account show || { log_error "You are not signed in to Azure"; }
-    [[ LOG_VERBOSE == "YES" ]] && (echo )
 
     log_info "Logged in to Azure successfully"
 }
