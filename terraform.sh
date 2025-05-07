@@ -96,7 +96,7 @@ function terraform_run() {
 
   # sanity
   ensure_command terraform
-  ensure_file "main.tf" || { log_error "main.tf not found, check your working directory"; }
+  ensure_file "main.tf"
 
   { \
       [[ "${environment}" != "" ]] && \
