@@ -23,25 +23,64 @@ source "${FOLDER_bash}/azure.sh"
 
 function terraform_backend_create() {
 
-  local FILE_variables_backend=$1
-
   log_title "Terraform backend create"
 
-  ensure_file ${FILE_variables_backend}
+  # defaults
+  local FILE_variables=""
+  local FILE_variables_backend=""
 
-  # backend resource group
+  # Parse named arguments
+  while [[ $# -gt 0 ]]; do
+      key="$1"
+      case $key in
+          --fileVars)
+          FILE_variables="$2"
+          shift
+          shift
+          ;;
+          --fileVarsBackend)
+          FILE_variables_backend="$2"
+          shift
+          shift
+          ;;
+      esac
+  done
+
+  # sanity
+  log_info "Sanity check..."
+  
+  { \
+    [[ "${FILE_variables}" != "" ]] && \
+    [[ "${FILE_variables_backend}" != "" ]] \
+  } || { log_error "Function argument missing"; }
+  
+  ensure_file "${FILE_variables}"
+  ensure_file "${FILE_variables_backend}"
+  log_info "Sanity check completed successfully"
+  (echo >&2)
+
+  # read variables
+  local location=$(value_from ${FILE_variables} location)
   local rg=$(value_from ${FILE_variables_backend} resource_group_name)
-  local location=$(value_from ${FILE_variables_backend} location)
+  local sa_name=$(value_from ${FILE_variables_backend} storage_account_name)
+  local sa_container_name=$(value_from ${FILE_variables_backend} container_name)
+
+  # log
+  log_info "[LOG] File variables: ${FILE_variables}"
+  log_info "[LOG] File variables backend: ${FILE_variables_backend}"
+  log_info "[LOG] location: ${location}"
+  log_info "[LOG] resource group: ${rg}"
+  log_info "[LOG] storage account name: ${sa_name}"
+  log_info "[LOG] container name: ${sa_container_name}"
+  (echo >&2)
+
+  # create resources (or confirm they already exist)
   azure_create_rg "${rg}" "${location}"
   (echo >&2)
 
-  # backend storage account
-  local sa_name=$(value_from ${FILE_variables_backend} storage_account_name)
   azure_create_sa "${rg}" "${location}" "${sa_name}" "Standard_LRS" "Cool" "true"
   (echo >&2)
 
-  # backend storage account container
-  local sa_container_name=$(value_from ${FILE_variables_backend} container_name)
   azure_create_sa_container "${sa_name}" "${sa_container_name}"
   (echo >&2)
 
