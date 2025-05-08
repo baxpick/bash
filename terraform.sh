@@ -95,6 +95,7 @@ function terraform_run() {
   local action=""
   local FILE_variables=""
   local FILE_variables_backend=""
+  local skip_apply="YES"
 
   # Parse named arguments
   while [[ $# -gt 0 ]]; do
@@ -125,6 +126,11 @@ function terraform_run() {
           shift
           shift
           ;;
+          --skipApply)
+          skip_apply="$2"
+          shift
+          shift
+          ;;
       esac
   done
 
@@ -138,6 +144,7 @@ function terraform_run() {
     [[ "${action}" != "" ]] && \
     [[ "${FILE_variables}" != "" ]] && \
     [[ "${FILE_variables_backend}" != "" ]] \
+    [[ "${skip_apply}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
   ensure_folder "${folder}"
@@ -159,6 +166,9 @@ function terraform_run() {
   log_info "Sanity check completed successfully"
   (echo >&2)
 
+  [[ "${skip_apply}" == "YES" ]] || [[ "${skip_apply}" == "NO" ]] || \
+    { log_error "Invalid skip_apply - must be 'YES' or 'NO'"; }
+  
   # log
   log_info "[LOG] Current working directory: '$(pwd)'"
 
@@ -167,6 +177,7 @@ function terraform_run() {
   log_info "[LOG] Action: ${action}"
   log_info "[LOG] File variables: ${FILE_variables}"
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
+  log_info "[LOG] Skip apply: ${skip_apply}"
   (echo >&2)
   
   # cleanup
@@ -206,11 +217,15 @@ function terraform_run() {
   # early exit on delete
   if [[ ${action} == "resourcesDelete" ]]; then
     log_info "Destroy..."
-    run terraform destroy -auto-approve -input=false \
-        -var "environment=${environment}" \
-        -var "action=${action}" \
-        -var-file="${FILE_variables}"
-    log_info "Destroy completed successfully"
+    if [[ "${skip_apply}" == "NO" ]]; then
+      run terraform destroy -auto-approve -input=false \
+          -var "environment=${environment}" \
+          -var "action=${action}" \
+          -var-file="${FILE_variables}"
+      log_info "Destroy completed successfully"
+    else
+      log_info "Destroy skipped"
+    fi
     (echo >&2)
     return 0
   fi
@@ -228,11 +243,15 @@ function terraform_run() {
     (echo >&2)
 
     log_info "Apply..."
-    run terraform apply \
-      -auto-approve \
-      -input=false \
-      "${environment}.plan"
-    log_info "Apply completed successfully"
+    if [[ "${skip_apply}" == "NO" ]]; then
+      run terraform apply \
+        -auto-approve \
+        -input=false \
+        "${environment}.plan"
+      log_info "Apply completed successfully"
+    else
+      log_info "Apply skipped"
+    fi
     (echo >&2)
   fi
 
