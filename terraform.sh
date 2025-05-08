@@ -34,7 +34,7 @@ function terraform_backend_create() {
       key="$1"
       case $key in
           --location)
-          FILE_variables="$2"
+          location="$2"
           shift
           shift
           ;;
