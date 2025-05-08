@@ -200,9 +200,9 @@ function terraform_run() {
   log_info "Refresh..."
   run terraform refresh \
     -var "environment=${environment}" \
-    -var "action=${action}" \  
-    -input=false \
-    -var-file="${FILE_variables}"
+    -var "action=${action}" \
+    -var-file="${FILE_variables}" \
+    -input=false
   log_info "Refresh completed successfully"
   (echo >&2)
 
