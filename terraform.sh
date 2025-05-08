@@ -143,7 +143,7 @@ function terraform_run() {
     [[ "${environment}" != "" ]] && \
     [[ "${action}" != "" ]] && \
     [[ "${FILE_variables}" != "" ]] && \
-    [[ "${FILE_variables_backend}" != "" ]] \
+    [[ "${FILE_variables_backend}" != "" ]] && \
     [[ "${skip_apply}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
