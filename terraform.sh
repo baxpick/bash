@@ -26,14 +26,14 @@ function terraform_backend_create() {
   log_title "Terraform backend create"
 
   # defaults
-  local FILE_variables=""
+  local location=""
   local FILE_variables_backend=""
 
   # Parse named arguments
   while [[ $# -gt 0 ]]; do
       key="$1"
       case $key in
-          --fileVars)
+          --location)
           FILE_variables="$2"
           shift
           shift
@@ -50,23 +50,20 @@ function terraform_backend_create() {
   log_info "Sanity check..."
   
   { \
-    [[ "${FILE_variables}" != "" ]] && \
+    [[ "${location}" != "" ]] && \
     [[ "${FILE_variables_backend}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
-  ensure_file "${FILE_variables}"
   ensure_file "${FILE_variables_backend}"
   log_info "Sanity check completed successfully"
   (echo >&2)
 
   # read variables
-  local location=$(value_from ${FILE_variables} location)
   local rg=$(value_from ${FILE_variables_backend} resource_group_name)
   local sa_name=$(value_from ${FILE_variables_backend} storage_account_name)
   local sa_container_name=$(value_from ${FILE_variables_backend} container_name)
 
   # log
-  log_info "[LOG] File variables: ${FILE_variables}"
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
   log_info "[LOG] location: ${location}"
   log_info "[LOG] resource group: ${rg}"
