@@ -37,7 +37,7 @@ function log_info() {
 }
 
 function log_done() {
-    (echo "✅ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
+    (echo "✔️ [$(date "+%Y-%m-%dT%H:%M:%S%z")] ${1}" >&2)
 }
 
 function log_special() {
