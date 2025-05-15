@@ -74,7 +74,7 @@ function aws_update_nameservers_from_azure_dns_zone() {
     done < <(echo "${AZURE_NS_UNPARSED}" | jq -r '.[]')
 
     log_info "Azure name servers used: ${AZURE_NS[0]}, ${AZURE_NS[1]}, ${AZURE_NS[2]}, ${AZURE_NS[3]}"
-    aws route53domains update-domain-nameservers \
+    run aws route53domains update-domain-nameservers \
         --region ${AWS_REGION} \
         --domain-name ${DOMAIN_NAME} \
         --nameservers \
