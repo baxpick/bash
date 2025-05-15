@@ -18,7 +18,7 @@ source "${FOLDER_bash}/logging.sh"
 # functions
 # #########
 
-get_cpu_cores() {
+function get_cpu_cores() {
     local cores=1
     if [[ "$(uname)" == "Darwin" ]]; then
         cores=$(sysctl -n hw.ncpu 2>/dev/null || echo 1)
