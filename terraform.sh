@@ -59,9 +59,9 @@ function terraform_backend_create() {
   (echo >&2)
 
   # read variables
-  local rg=$(value_from ${FILE_variables_backend} resource_group_name)
-  local sa_name=$(value_from ${FILE_variables_backend} storage_account_name)
-  local sa_container_name=$(value_from ${FILE_variables_backend} container_name)
+  local rg=$(value_from --file ${FILE_variables_backend} --findKey resource_group_name)
+  local sa_name=$(value_from --file ${FILE_variables_backend} --findKey storage_account_name)
+  local sa_container_name=$(value_from --file ${FILE_variables_backend} --findKey container_name)
 
   # log
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
