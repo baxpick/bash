@@ -72,13 +72,13 @@ function terraform_backend_create() {
   (echo >&2)
 
   # create resources (or confirm they already exist)
-  azure_create_rg "${rg}" "${location}"
+  azure_create_rg --resourceGroup "${rg}" --location "${location}"
   (echo >&2)
 
-  azure_create_sa "${rg}" "${location}" "${sa_name}" "Standard_LRS" "Cool" "true"
+  azure_create_sa --resourceGroup "${rg}" --location "${location}" --saName "${sa_name}" --saSku "Standard_LRS" --saTier "Cool" --saPublic "true"
   (echo >&2)
 
-  azure_create_sa_container "${sa_name}" "${sa_container_name}"
+  azure_create_sa_container --saName "${sa_name}" --saContainerName "${sa_container_name}"
   (echo >&2)
 
   log_info "Terraform backend created successfully"

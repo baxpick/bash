@@ -29,9 +29,32 @@ function azure_login() {
 
     log_info "Logging in to Azure..."
 
-    local CLIENT_ID=${1}
-    local CLIENT_SECRET=${2}
-    local TENANT_ID=${3}
+    # defaults
+    local CLIENT_ID=""
+    local CLIENT_SECRET=""
+    local TENANT_ID=""
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --clientId)
+            CLIENT_ID="$2"
+            shift
+            shift
+            ;;
+            --clientSecret)
+            CLIENT_SECRET="$2"
+            shift
+            shift
+            ;;
+            --tenantId)
+            TENANT_ID="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ ${CLIENT_ID} != "" ]] && \
@@ -54,8 +77,26 @@ function azure_create_rg() {
 
     log_info "Create resource group..."
 
-    local rg=${1}
-    local location=${2}
+    # defaults
+    local rg=""
+    local location=""
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --resourceGroup)
+            rg="$2"
+            shift
+            shift
+            ;;
+            --location)
+            location="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ "${rg}" != "" ]] && \
@@ -80,12 +121,50 @@ function azure_create_sa() {
 
     log_info "Create storage account..."
 
-    local rg=${1}
-    local location=${2}
-    local sa_name=${3}
-    local sa_sku=${4}
-    local sa_tier=${5}
-    local sa_public=${6}
+    # defaults
+    local rg=""
+    local location=""
+    local sa_name=""
+    local sa_sku=""
+    local sa_tier=""
+    local sa_public=""
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --resourceGroup)
+            rg="$2"
+            shift
+            shift
+            ;;
+            --location)
+            location="$2"
+            shift
+            shift
+            ;;
+            --saName)
+            sa_name="$2"
+            shift
+            shift
+            ;;
+            --saSku)
+            sa_sku="$2"
+            shift
+            shift
+            ;;
+            --saTier)
+            sa_tier="$2"
+            shift
+            shift
+            ;;
+            --saPublic)
+            sa_public="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ "${rg}" != "" ]] && \
@@ -130,8 +209,26 @@ function azure_create_sa() {
 function azure_create_sa_container() {
     log_info "Create storage account container..."
 
-    local sa_name=${1}
-    local sa_container_name=${2}
+    # defaults
+    local sa_name=""
+    local sa_container_name=""
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --saName)
+            sa_name="$2"
+            shift
+            shift
+            ;;
+            --saContainerName)
+            sa_container_name="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ ${sa_name} != "" ]] && \
