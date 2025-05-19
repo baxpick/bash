@@ -22,9 +22,32 @@ function aws_login() {
 
     log_info "Logging in to AWS..."
 
-    local ACCESS_KEY_ID=${1}
-    local SECRET_ACCESS_KEY=${2}
-    local DEFAULT_REGION=${3}
+    # defaults
+    local ACCESS_KEY_ID=""
+    local SECRET_ACCESS_KEY=""
+    local DEFAULT_REGION=""
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --accessKeyId)
+            ACCESS_KEY_ID="$2"
+            shift
+            shift
+            ;;
+            --secretAccessKey)
+            SECRET_ACCESS_KEY="$2"
+            shift
+            shift
+            ;;
+            --defaultRegion)
+            DEFAULT_REGION="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ ${ACCESS_KEY_ID} != "" ]] && \
@@ -50,10 +73,38 @@ function aws_update_nameservers_from_azure_dns_zone() {
 
     log_info "Updating aws name servers from azure dns zone..."
 
-    local DOMAIN_NAME=${1}
-    local AWS_REGION=${2}
-    local AZURE_DNS_ZONE_RG=${3}
-    local WAIT_FOR_UPDATE=${4}
+    # defaults
+    local DOMAIN_NAME=""
+    local AWS_REGION=""
+    local AZURE_DNS_ZONE_RG=""
+    local WAIT_FOR_UPDATE="YES"
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --domainName)
+            DOMAIN_NAME="$2"
+            shift
+            shift
+            ;;
+            --awsRegion)
+            AWS_REGION="$2"
+            shift
+            shift
+            ;;
+            --azureDnsZoneRg)
+            AZURE_DNS_ZONE_RG="$2"
+            shift
+            shift
+            ;;
+            --waitForUpdate)
+            WAIT_FOR_UPDATE="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
 
     { \
         [[ ${DOMAIN_NAME} != "" ]] && \
