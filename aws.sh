@@ -57,16 +57,13 @@ function aws_login() {
 
     ensure_command "aws"
 
-    if \
-        aws configure set aws_access_key_id $ACCESS_KEY_ID && \
-        aws configure set aws_secret_access_key $SECRET_ACCESS_KEY && \
-        aws configure set default.region $DEFAULT_REGION && \
-        aws sts get-caller-identity; then
+    aws configure set aws_access_key_id $ACCESS_KEY_ID >/dev/null 2>&1
+    aws configure set aws_secret_access_key $SECRET_ACCESS_KEY >/dev/null 2>&1
+    aws configure set default.region $DEFAULT_REGION >/dev/null 2>&1
 
-        log_info "Logged in to AWS successfully"
-    else
-        log_error "You are not signed in to AWS"
-    fi   
+    run aws sts get-caller-identity || { log_error "You are not signed in to AWS"; }
+
+    log_info "Logged in to AWS successfully"
 }
 
 function aws_update_nameservers_from_azure_dns_zone() {
