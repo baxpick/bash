@@ -96,6 +96,7 @@ function opentofu_run() {
   local FILE_variables=""
   local FILE_variables_backend=""
   local skip_apply="YES"
+  local my_ip=""
 
   # Parse named arguments
   while [[ $# -gt 0 ]]; do
@@ -131,6 +132,11 @@ function opentofu_run() {
           shift
           shift
           ;;
+          --myIp)
+          my_ip="$2"
+          shift
+          shift
+          ;;          
       esac
   done
 
@@ -145,6 +151,7 @@ function opentofu_run() {
     [[ "${FILE_variables}" != "" ]] && \
     [[ "${FILE_variables_backend}" != "" ]] && \
     [[ "${skip_apply}" != "" ]] \
+    [[ "${my_ip}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
   ensure_folder "${folder}"
@@ -178,6 +185,7 @@ function opentofu_run() {
   log_info "[LOG] File variables: ${FILE_variables}"
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
   log_info "[LOG] Skip apply: ${skip_apply}"
+  log_info "[LOG] My IP: ${my_ip}"
   (echo >&2)
   
   # cleanup
@@ -193,6 +201,7 @@ function opentofu_run() {
     -upgrade -input=false \
     -var "environment=${environment}" \
     -var "action=${action}" \
+    -var "my_ip=${my_ip}" \
     -var-file="${FILE_variables}" \
     -backend-config="${FILE_variables_backend}"
   log_info "Initialize completed successfully"
@@ -209,6 +218,7 @@ function opentofu_run() {
   run tofu refresh \
     -var "environment=${environment}" \
     -var "action=${action}" \
+    -var "my_ip=${my_ip}" \
     -var-file="${FILE_variables}" \
     -input=false
   log_info "Refresh completed successfully"
@@ -221,6 +231,7 @@ function opentofu_run() {
       run tofu destroy -auto-approve -input=false \
           -var "environment=${environment}" \
           -var "action=${action}" \
+          -var "my_ip=${my_ip}" \
           -var-file="${FILE_variables}"
       log_info "Destroy completed successfully"
     else
@@ -236,6 +247,7 @@ function opentofu_run() {
     run tofu plan \
       -var "environment=${environment}" \
       -var "action=${action}" \
+      -var "my_ip=${my_ip}" \
       -input=false \
       -var-file="${FILE_variables}" \
       -out "${environment}.plan"
