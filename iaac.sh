@@ -1,8 +1,11 @@
 # include guard
-if [[ -n "$_TERRAFORM_SH_INCLUDED" ]]; then
+if [[ -n "$_IAAC_SH_INCLUDED" ]]; then
   return
 fi
-_TERRAFORM_SH_INCLUDED=1
+_IAAC_SH_INCLUDED=1
+
+# arguments (from environment - since script should be sourced)
+TOOL="${IAAC_TOOL:-terraform}"
 
 # absolute path to root folder
 if [[ "${FOLDER_bash}" == "" ]]; then
@@ -21,9 +24,9 @@ source "${FOLDER_bash}/azure.sh"
 # functions
 # #########
 
-function terraform_backend_create() {
+function iaac_backend_create() {
 
-  log_title "Terraform backend create"
+  log_title "IaaC backend create"
 
   # defaults
   local location=""
@@ -81,13 +84,13 @@ function terraform_backend_create() {
   azure_create_sa_container --saName "${sa_name}" --saContainerName "${sa_container_name}"
   (echo >&2)
 
-  log_info "Terraform backend created successfully"
+  log_info "IaaC backend created successfully"
 }
 
-# wraps terraform commands
-function terraform_run() {
+# wraps IaaC commands
+function iaac_run() {
 
-  log_title "Terraform run"
+  log_title "IaaC run"
 
   # defaults
   local folder=""
@@ -142,7 +145,7 @@ function terraform_run() {
 
   # sanity
   log_info "Sanity check..."
-  ensure_command terraform
+  ensure_command ${TOOL}
   
   { \
     [[ "${folder}" != "" ]] && \
@@ -197,7 +200,7 @@ function terraform_run() {
 
   # init
   log_info "Initialize..."
-  run terraform init \
+  run ${TOOL} init \
     -upgrade -input=false \
     -var "environment=${environment}" \
     -var "action=${action}" \
@@ -209,13 +212,13 @@ function terraform_run() {
 
   # validate
   log_info "Validate..."
-  run terraform validate
+  run ${TOOL} validate
   log_info "Validate completed successfully"
   (echo >&2)
 
   # refresh
   log_info "Refresh..."
-  run terraform refresh \
+  run ${TOOL} refresh \
     -var "environment=${environment}" \
     -var "action=${action}" \
     -var "my_ip=${my_ip}" \
@@ -228,7 +231,7 @@ function terraform_run() {
   if [[ ${action} == "resourcesDelete" ]]; then
     log_info "Destroy..."
     if [[ "${skip_apply}" == "NO" ]]; then
-      run terraform destroy -auto-approve -input=false \
+      run ${TOOL} destroy -auto-approve -input=false \
           -var "environment=${environment}" \
           -var "action=${action}" \
           -var "my_ip=${my_ip}" \
@@ -244,7 +247,7 @@ function terraform_run() {
   # otherwise plan and apply
   if [[ ${action} == "resourcesCreate" ]]; then
     log_info "Plan..."
-    run terraform plan \
+    run ${TOOL} plan \
       -var "environment=${environment}" \
       -var "action=${action}" \
       -var "my_ip=${my_ip}" \
@@ -256,7 +259,7 @@ function terraform_run() {
 
     log_info "Apply..."
     if [[ "${skip_apply}" == "NO" ]]; then
-      run terraform apply \
+      run ${TOOL} apply \
         -auto-approve \
         -input=false \
         "${environment}.plan"
@@ -268,6 +271,6 @@ function terraform_run() {
   fi
 
   cd - > /dev/null 2>&1
-  log_info "Terraform run completed successfully"
+  log_info "IaaC run completed successfully"
   (echo >&2)
 }
