@@ -274,3 +274,76 @@ function iaac_run() {
   log_info "IaaC run completed successfully"
   (echo >&2)
 }
+
+# open access to resource so that change can be applied
+function iaac_azure_resource_open() {
+
+  log_title "IaaC open azure resource access"
+
+  # defaults
+  local ipAddress=""
+  local resourceGroup=""
+  local resourceName=""
+  local resourceType=""
+
+  # Parse named arguments
+  while [[ $# -gt 0 ]]; do
+      key="$1"
+      case $key in
+          --ipAddress)
+          ipAddress="$2"
+          shift
+          shift
+          ;;      
+          --resourceGroup)
+          resourceGroup="$2"
+          shift
+          shift
+          ;;
+          --resourceName)
+          resourceName="$2"
+          shift
+          shift
+          ;;
+          --resourceType)
+          resourceType="$2"
+          shift
+          shift
+          ;;    
+      esac
+  done
+
+  # sanity
+  log_info "Sanity check..."
+  ensure_command az
+  { \
+    [[ "${ipAddress}" != "" ]] && \
+    [[ "${resourceGroup}" != "" ]] && \
+    [[ "${resourceName}" != "" ]] && \
+    [[ "${resourceType}" != "" ]] && \
+  } || { log_error "Function argument missing"; }
+
+  # log
+  log_info "[LOG] IP Address: ${ipAddress}"
+  log_info "[LOG] Resource Group: ${resourceGroup}"
+  log_info "[LOG] Resource Name: ${resourceName}"
+  log_info "[LOG] Resource Type: ${resourceType}"
+  (echo >&2)
+
+  # main
+  if [[ "${resourceType}" == "postgres_flexible_server" ]]; then
+    run az postgres flexible-server \
+        firewall-rule create \
+        --resource-group ${resourceGroup} \
+        --name psqlf-main-mysurvey-wes-prod \
+        --rule-name "allow-current-ip" \
+        --start-ip-address ${ipAddress} \
+        --end-ip-address ${ipAddress}
+  else
+    log_error "Unsupported resource type '${resourceType}'"
+  fi
+  (echo >&2)
+
+  log_info "IaaC open azure resource access completed successfully"
+  (echo >&2)
+}
