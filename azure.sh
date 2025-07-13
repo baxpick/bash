@@ -322,3 +322,63 @@ function azure_resource_open() {
 
   log_info "Open azure resource access completed successfully"
 }
+
+# close access to resource so that change can be applied
+function azure_resource_close() {
+
+  log_info "Close azure resource access..."
+
+  # defaults
+  local resourceGroup=""
+  local resourceName=""
+  local resourceType=""
+
+  # Parse named arguments
+  while [[ $# -gt 0 ]]; do
+      key="$1"
+      case $key in
+          --resourceGroup)
+          resourceGroup="$2"
+          shift
+          shift
+          ;;
+          --resourceName)
+          resourceName="$2"
+          shift
+          shift
+          ;;
+          --resourceType)
+          resourceType="$2"
+          shift
+          shift
+          ;;    
+      esac
+  done
+
+  # sanity
+  log_info "Sanity check..."
+  ensure_command az
+  { \
+    [[ "${resourceGroup}" != "" ]] && \
+    [[ "${resourceName}" != "" ]] && \
+    [[ "${resourceType}" != "" ]] \
+  } || { log_error "Function argument missing"; }
+
+  # log
+  log_info "[LOG] Resource Group: ${resourceGroup}"
+  log_info "[LOG] Resource Name: ${resourceName}"
+  log_info "[LOG] Resource Type: ${resourceType}"
+
+  # main
+  if [[ "${resourceType}" == "postgres_flexible_server" ]]; then
+    run az postgres flexible-server \
+        firewall-rule delete \
+        --resource-group ${resourceGroup} \
+        --name psqlf-main-mysurvey-wes-prod \
+        --rule-name "allow-current-ip"
+  else
+    log_error "Unsupported resource type '${resourceType}'"
+  fi
+
+  log_info "Close azure resource access completed successfully"
+}
