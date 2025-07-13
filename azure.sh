@@ -375,7 +375,8 @@ function azure_resource_close() {
         firewall-rule delete \
         --resource-group ${resourceGroup} \
         --name psqlf-main-mysurvey-wes-prod \
-        --rule-name "allow-current-ip"
+        --rule-name "allow-current-ip" \
+        --yes
   else
     log_error "Unsupported resource type '${resourceType}'"
   fi
