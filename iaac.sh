@@ -99,6 +99,10 @@ function iaac_run() {
   local FILE_variables=""
   local FILE_variables_backend=""
   local skip_apply="YES"
+  local skip_cleanup="NO"
+  local skip_init="NO"
+  local skip_validate="NO"
+  local skip_refresh="NO"
   local my_ip=""
 
   # Parse named arguments
@@ -132,6 +136,26 @@ function iaac_run() {
           ;;
           --skipApply)
           skip_apply="$2"
+          shift
+          shift
+          ;;
+          --skipCleanup)
+          skip_cleanup="$2"
+          shift
+          shift
+          ;;
+          --skipInit)
+          skip_init="$2"
+          shift
+          shift
+          ;;
+          --skipValidate)
+          skip_validate="$2"
+          shift
+          shift
+          ;;
+          --skipRefresh)
+          skip_refresh="$2"
           shift
           shift
           ;;
@@ -178,6 +202,14 @@ function iaac_run() {
 
   [[ "${skip_apply}" == "YES" ]] || [[ "${skip_apply}" == "NO" ]] || \
     { log_error "Invalid skip_apply - must be 'YES' or 'NO'"; }
+  [[ "${skip_cleanup}" == "YES" ]] || [[ "${skip_cleanup}" == "NO" ]] || \
+    { log_error "Invalid skip_cleanup - must be 'YES' or 'NO'"; }
+  [[ "${skip_init}" == "YES" ]] || [[ "${skip_init}" == "NO" ]] || \
+    { log_error "Invalid skip_init - must be 'YES' or 'NO'"; }
+  [[ "${skip_validate}" == "YES" ]] || [[ "${skip_validate}" == "NO" ]] || \
+    { log_error "Invalid skip_validate - must be 'YES' or 'NO'"; }
+  [[ "${skip_refresh}" == "YES" ]] || [[ "${skip_refresh}" == "NO" ]] || \
+    { log_error "Invalid skip_refresh - must be 'YES' or 'NO'"; }
   
   # log
   log_info "[LOG] Current working directory: '$(pwd)'"
@@ -188,43 +220,63 @@ function iaac_run() {
   log_info "[LOG] File variables: ${FILE_variables}"
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
   log_info "[LOG] Skip apply: ${skip_apply}"
+  log_info "[LOG] Skip cleanup: ${skip_cleanup}"
+  log_info "[LOG] Skip init: ${skip_init}"
+  log_info "[LOG] Skip validate: ${skip_validate}"
+  log_info "[LOG] Skip refresh: ${skip_refresh}"
   log_info "[LOG] My IP: ${my_ip}"
   (echo >&2)
   
   # cleanup
-  log_info "Cleanup..."
-  rm -rf .terraform* 2>/dev/null
-  rm "${environment}.plan" 2>/dev/null
-  log_info "Cleanup completed successfully"
+  if [[ "${skip_cleanup}" == "NO" ]]; then
+    log_info "Cleanup..."
+    rm -rf .terraform* 2>/dev/null
+    rm "${environment}.plan" 2>/dev/null
+    log_info "Cleanup completed successfully"
+  else
+    log_info "Cleanup skipped"
+  fi
   (echo >&2)
 
   # init
-  log_info "Initialize..."
-  run ${TOOL} init \
-    -upgrade -input=false \
-    -var "environment=${environment}" \
-    -var "action=${action}" \
-    -var "my_ip=${my_ip}" \
-    -var-file="${FILE_variables}" \
-    -backend-config="${FILE_variables_backend}"
-  log_info "Initialize completed successfully"
+  if [[ "${skip_init}" == "NO" ]]; then
+    log_info "Initialize..."
+    run ${TOOL} init \
+      -upgrade -input=false \
+      -var "environment=${environment}" \
+      -var "action=${action}" \
+      -var "my_ip=${my_ip}" \
+      -var-file="${FILE_variables}" \
+      -backend-config="${FILE_variables_backend}"
+    log_info "Initialize completed successfully"
+  else
+    log_info "Initialize skipped"
+  fi
   (echo >&2)
 
   # validate
-  log_info "Validate..."
-  run ${TOOL} validate
-  log_info "Validate completed successfully"
+  if [[ "${skip_validate}" == "NO" ]]; then
+    log_info "Validate..."
+    run ${TOOL} validate
+    log_info "Validate completed successfully"
+  else
+    log_info "Validate skipped"
+  fi
   (echo >&2)
 
   # refresh
-  log_info "Refresh..."
-  run ${TOOL} refresh \
-    -var "environment=${environment}" \
-    -var "action=${action}" \
-    -var "my_ip=${my_ip}" \
-    -var-file="${FILE_variables}" \
-    -input=false
-  log_info "Refresh completed successfully"
+  if [[ "${skip_refresh}" == "NO" ]]; then
+    log_info "Refresh..."
+    run ${TOOL} refresh \
+      -var "environment=${environment}" \
+      -var "action=${action}" \
+      -var "my_ip=${my_ip}" \
+      -var-file="${FILE_variables}" \
+      -input=false
+    log_info "Refresh completed successfully"
+  else
+    log_info "Refresh skipped"
+  fi
   (echo >&2)
 
   # early exit on delete
