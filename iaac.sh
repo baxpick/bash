@@ -265,19 +265,19 @@ function iaac_run() {
   (echo >&2)
 
   # refresh
-  log_info "Refresh..."
-  if [[ "${skip_refresh}" == "NO" ]]; then
-    run ${TOOL} refresh \
-      -var "environment=${environment}" \
-      -var "action=${action}" \
-      -var "my_ip=${my_ip}" \
-      -var-file="${FILE_variables}" \
-      -input=false
-    log_info "Refresh completed successfully"
-  else
-    log_info "Refresh skipped"
-  fi
-  (echo >&2)
+  # log_info "Refresh..."
+  # if [[ "${skip_refresh}" == "NO" ]]; then
+  #   run ${TOOL} refresh \
+  #     -var "environment=${environment}" \
+  #     -var "action=${action}" \
+  #     -var "my_ip=${my_ip}" \
+  #     -var-file="${FILE_variables}" \
+  #     -input=false
+  #   log_info "Refresh completed successfully"
+  # else
+  #   log_info "Refresh skipped"
+  # fi
+  # (echo >&2)
 
   # early exit on delete
   if [[ ${action} == "resourcesDelete" ]]; then
