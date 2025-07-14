@@ -228,8 +228,8 @@ function iaac_run() {
   (echo >&2)
   
   # cleanup
+  log_info "Cleanup..."
   if [[ "${skip_cleanup}" == "NO" ]]; then
-    log_info "Cleanup..."
     rm -rf .terraform* 2>/dev/null
     rm "${environment}.plan" 2>/dev/null
     log_info "Cleanup completed successfully"
@@ -239,8 +239,8 @@ function iaac_run() {
   (echo >&2)
 
   # init
+  log_info "Initialize..."
   if [[ "${skip_init}" == "NO" ]]; then
-    log_info "Initialize..."
     run ${TOOL} init \
       -upgrade -input=false \
       -var "environment=${environment}" \
@@ -255,8 +255,8 @@ function iaac_run() {
   (echo >&2)
 
   # validate
+  log_info "Validate..."
   if [[ "${skip_validate}" == "NO" ]]; then
-    log_info "Validate..."
     run ${TOOL} validate
     log_info "Validate completed successfully"
   else
@@ -265,8 +265,8 @@ function iaac_run() {
   (echo >&2)
 
   # refresh
+  log_info "Refresh..."
   if [[ "${skip_refresh}" == "NO" ]]; then
-    log_info "Refresh..."
     run ${TOOL} refresh \
       -var "environment=${environment}" \
       -var "action=${action}" \
