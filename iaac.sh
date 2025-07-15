@@ -319,7 +319,8 @@ function iaac_run() {
     else
       log_info "Plan+Apply skipped"
     fi
-    (echo >&2)
+    log_info "Plan+Apply (real) completed successfully"
+    (echo >&2)    
   fi
 
   cd - > /dev/null 2>&1
