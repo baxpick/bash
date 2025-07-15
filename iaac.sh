@@ -274,26 +274,48 @@ function iaac_run() {
 
   # otherwise plan and apply
   if [[ ${action} == "resourcesCreate" ]]; then
-    log_info "Plan..."
+    log_info "Plan... (refresh only)"
     run ${TOOL} plan \
       -var "environment=${environment}" \
       -var "action=${action}" \
       -var "my_ip=${my_ip}" \
       -input=false \
+      -refresh-only \
       -var-file="${FILE_variables}" \
       -out "${environment}.plan"
     log_info "Plan completed successfully"
     (echo >&2)
 
-    log_info "Apply..."
+    log_info "Apply... (refresh only)"
+    run ${TOOL} apply \
+      -auto-approve \
+      -input=false \
+      -refresh-only \
+      "${environment}.plan"
+    log_info "Apply completed successfully"
+    (echo >&2)
+
+    log_info "Plan+Apply... (real)"
     if [[ "${skip_apply}" == "NO" ]]; then
+      log_info "Plan... (real)"
+      run ${TOOL} plan \
+        -var "environment=${environment}" \
+        -var "action=${action}" \
+        -var "my_ip=${my_ip}" \
+        -input=false \
+        -var-file="${FILE_variables}" \
+        -out "${environment}.plan"
+      log_info "Plan (real) completed successfully"
+      (echo >&2)
+
+      log_info "Apply... (real)"
       run ${TOOL} apply \
         -auto-approve \
         -input=false \
         "${environment}.plan"
-      log_info "Apply completed successfully"
+      log_info "Apply (real) completed successfully"
     else
-      log_info "Apply skipped"
+      log_info "Plan+Apply skipped"
     fi
     (echo >&2)
   fi
