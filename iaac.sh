@@ -102,7 +102,6 @@ function iaac_run() {
   local skip_cleanup="NO"
   local skip_init="NO"
   local skip_validate="NO"
-  local skip_refresh="NO"
   local my_ip=""
 
   # Parse named arguments
@@ -151,11 +150,6 @@ function iaac_run() {
           ;;
           --skipValidate)
           skip_validate="$2"
-          shift
-          shift
-          ;;
-          --skipRefresh)
-          skip_refresh="$2"
           shift
           shift
           ;;
@@ -208,8 +202,6 @@ function iaac_run() {
     { log_error "Invalid skip_init - must be 'YES' or 'NO'"; }
   [[ "${skip_validate}" == "YES" ]] || [[ "${skip_validate}" == "NO" ]] || \
     { log_error "Invalid skip_validate - must be 'YES' or 'NO'"; }
-  [[ "${skip_refresh}" == "YES" ]] || [[ "${skip_refresh}" == "NO" ]] || \
-    { log_error "Invalid skip_refresh - must be 'YES' or 'NO'"; }
   
   # log
   log_info "[LOG] Current working directory: '$(pwd)'"
@@ -223,7 +215,6 @@ function iaac_run() {
   log_info "[LOG] Skip cleanup: ${skip_cleanup}"
   log_info "[LOG] Skip init: ${skip_init}"
   log_info "[LOG] Skip validate: ${skip_validate}"
-  log_info "[LOG] Skip refresh: ${skip_refresh}"
   log_info "[LOG] My IP: ${my_ip}"
   (echo >&2)
   
@@ -263,21 +254,6 @@ function iaac_run() {
     log_info "Validate skipped"
   fi
   (echo >&2)
-
-  # refresh
-  # log_info "Refresh..."
-  # if [[ "${skip_refresh}" == "NO" ]]; then
-  #   run ${TOOL} refresh \
-  #     -var "environment=${environment}" \
-  #     -var "action=${action}" \
-  #     -var "my_ip=${my_ip}" \
-  #     -var-file="${FILE_variables}" \
-  #     -input=false
-  #   log_info "Refresh completed successfully"
-  # else
-  #   log_info "Refresh skipped"
-  # fi
-  # (echo >&2)
 
   # early exit on delete
   if [[ ${action} == "resourcesDelete" ]]; then
