@@ -321,7 +321,7 @@ function azure_resource_open() {
         firewall-rule create \
         --resource-group "${resourceGroup}" \
         --name "${resourceName}" \
-        --rule-name "allow-current-ip" \
+        --rule-name "allow-ip-range" \
         --start-ip-address "${ipAddressStart}" \
         --end-ip-address "${ipAddressEnd}"
   else
@@ -383,7 +383,7 @@ function azure_resource_close() {
         firewall-rule delete \
         --resource-group "${resourceGroup}" \
         --name "${resourceName}" \
-        --rule-name "allow-current-ip" \
+        --rule-name "allow-ip-range" \
         --yes
   else
     log_error "Unsupported resource type '${resourceType}'"
