@@ -259,7 +259,8 @@ function azure_resource_open() {
   log_info "Open azure resource access"
 
   # defaults
-  local ipAddress=""
+  local ipAddressStart=""
+  local ipAddressEnd=""
   local resourceGroup=""
   local resourceName=""
   local resourceType=""
@@ -268,11 +269,16 @@ function azure_resource_open() {
   while [[ $# -gt 0 ]]; do
       key="$1"
       case $key in
-          --ipAddress)
-          ipAddress="$2"
+          --ipAddressStart)
+          ipAddressStart="$2"
           shift
           shift
-          ;;      
+          ;;
+          --ipAddressEnd)
+          ipAddressEnd="$2"
+          shift
+          shift
+          ;;
           --resourceGroup)
           resourceGroup="$2"
           shift
@@ -295,14 +301,16 @@ function azure_resource_open() {
   log_info "Sanity check..."
   ensure_command az
   { \
-    [[ "${ipAddress}" != "" ]] && \
+    [[ "${ipAddressStart}" != "" ]] && \
+    [[ "${ipAddressEnd}" != "" ]] && \
     [[ "${resourceGroup}" != "" ]] && \
     [[ "${resourceName}" != "" ]] && \
     [[ "${resourceType}" != "" ]] \
   } || { log_error "Function argument missing"; }
 
   # log
-  log_info "[LOG] IP Address: ${ipAddress}"
+  log_info "[LOG] IP Address Start: ${ipAddressStart}"
+  log_info "[LOG] IP Address End: ${ipAddressEnd}"
   log_info "[LOG] Resource Group: ${resourceGroup}"
   log_info "[LOG] Resource Name: ${resourceName}"
   log_info "[LOG] Resource Type: ${resourceType}"
@@ -314,8 +322,8 @@ function azure_resource_open() {
         --resource-group "${resourceGroup}" \
         --name "${resourceName}" \
         --rule-name "allow-current-ip" \
-        --start-ip-address "${ipAddress}" \
-        --end-ip-address "${ipAddress}"
+        --start-ip-address "${ipAddressStart}" \
+        --end-ip-address "${ipAddressEnd}"
   else
     log_error "Unsupported resource type '${resourceType}'"
   fi
