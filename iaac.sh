@@ -310,6 +310,7 @@ function iaac_run() {
 
       log_info "Apply... (real)"
       run ${TOOL} apply \
+        -refresh=false \
         -auto-approve \
         -input=false \
         "${environment}.plan"
