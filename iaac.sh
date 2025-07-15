@@ -273,7 +273,9 @@ function iaac_run() {
   fi
 
   # otherwise plan and apply
-  if [[ ${action} == "resourcesCreate" ]]; then
+   if [[ ${action} == "resourcesCreate" ]]; then
+
+    # sync local state if drift was made
     log_info "Plan... (refresh only)"
     run ${TOOL} plan \
       -var "environment=${environment}" \
@@ -282,18 +284,18 @@ function iaac_run() {
       -input=false \
       -refresh-only \
       -var-file="${FILE_variables}" \
-      -out "${environment}.plan"
+      -out "temp.plan"
     log_info "Plan completed successfully"
     (echo >&2)
 
-    log_info "Apply... (refresh only)"
-    run ${TOOL} apply \
-      -auto-approve \
-      -input=false \
-      -refresh-only \
-      "${environment}.plan"
-    log_info "Apply completed successfully"
-    (echo >&2)
+  #   log_info "Apply... (refresh only)"
+  #   run ${TOOL} apply \
+  #     -auto-approve \
+  #     -input=false \
+  #     -refresh-only \
+  #     "temp.plan"
+  #   log_info "Apply completed successfully"
+  #   (echo >&2)
 
     log_info "Plan+Apply... (real)"
     if [[ "${skip_apply}" == "NO" ]]; then
@@ -310,7 +312,6 @@ function iaac_run() {
 
       log_info "Apply... (real)"
       run ${TOOL} apply \
-        -refresh=false \
         -auto-approve \
         -input=false \
         "${environment}.plan"
