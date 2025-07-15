@@ -311,11 +311,11 @@ function azure_resource_open() {
   if [[ "${resourceType}" == "postgres_flexible_server" ]]; then
     run az postgres flexible-server \
         firewall-rule create \
-        --resource-group ${resourceGroup} \
-        --name psqlf-main-mysurvey-wes-prod \
+        --resource-group "${resourceGroup}" \
+        --name "${resourceName}" \
         --rule-name "allow-current-ip" \
-        --start-ip-address ${ipAddress} \
-        --end-ip-address ${ipAddress}
+        --start-ip-address "${ipAddress}" \
+        --end-ip-address "${ipAddress}"
   else
     log_error "Unsupported resource type '${resourceType}'"
   fi
@@ -373,8 +373,8 @@ function azure_resource_close() {
   if [[ "${resourceType}" == "postgres_flexible_server" ]]; then
     run az postgres flexible-server \
         firewall-rule delete \
-        --resource-group ${resourceGroup} \
-        --name psqlf-main-mysurvey-wes-prod \
+        --resource-group "${resourceGroup}" \
+        --name "${resourceName}" \
         --rule-name "allow-current-ip" \
         --yes
   else
