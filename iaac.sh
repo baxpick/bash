@@ -223,6 +223,7 @@ function iaac_run() {
   if [[ "${skip_cleanup}" == "NO" ]]; then
     rm -rf .terraform* 2>/dev/null
     rm "${environment}.plan" 2>/dev/null
+    rm "${environment}.plan.json" 2>/dev/null
     log_info "Cleanup completed successfully"
   else
     log_info "Cleanup skipped"
@@ -315,6 +316,7 @@ function iaac_run() {
         -auto-approve \
         -input=false \
         "${environment}.plan"
+      run ${TOOL} show -json "${environment}.plan" >"${environment}.plan.json"
       log_info "Apply (real) completed successfully"
     else
       log_info "Plan+Apply skipped"
