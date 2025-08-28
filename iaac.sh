@@ -308,7 +308,7 @@ function iaac_run() {
         -input=false \
         -var-file="${FILE_variables}" \
         -out "${environment}.plan"
-      run ${TOOL} show -json "${environment}.plan" >"${environment}.plan.json"
+      ${TOOL} show -json "${environment}.plan" >"${environment}.plan.json"
       log_info "Plan (real) completed successfully"
       (echo >&2)
 
