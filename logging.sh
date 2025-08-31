@@ -53,6 +53,15 @@ function log_title() {
     )
 }
 
+function log_subtitle() {
+    (\
+        echo >&2 && \
+        echo "${1}" >&2 && \
+        echo "$(printf "%0.s-" {1..40})" >&2 && \
+        echo >&2 \
+    )
+}
+
 _log_box() {
     local text="${1}"
     local frameChar="${2:0:1}"

@@ -26,7 +26,7 @@ source "${FOLDER_bash}/azure.sh"
 
 function iaac_backend_create() {
 
-  log_title "IaaC backend create"
+  log_subtitle "IaaC backend create"
 
   # defaults
   local location=""
@@ -90,7 +90,7 @@ function iaac_backend_create() {
 # wraps IaaC commands
 function iaac_run() {
 
-  log_title "IaaC run"
+  log_subtitle "IaaC run"
 
   # defaults
   local folder=""
