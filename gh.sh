@@ -63,8 +63,6 @@ function gh_login() {
 # Set or create an GitHub variable on a repo
 function gh_repo_set_var() {
 
-    log_info "Setting GH var '${var_name}'"
-
     # defaults
     local var_name=""
     local var_value=""

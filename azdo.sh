@@ -26,12 +26,14 @@ az extension show --name azure-devops >/dev/null 2>&1 || \
 # functions
 # #########
 
-function azdo_set_pat() {
+function azdo_login() {
 
-    log_info "Set Azure DevOps PAT..."
+    log_info "Login to Azure DevOps..."
 
     # defaults
     local pat=""
+    local organization=""
+    local project=""
 
     # Parse named arguments
     while [[ $# -gt 0 ]]; do
@@ -42,24 +44,36 @@ function azdo_set_pat() {
             shift
             shift
             ;;
+            --organization)
+            organization="$2"
+            shift
+            shift
+            ;;
+            --project)
+            project="$2"
+            shift
+            shift
+            ;;
         esac
     done
 
     { \
-        [[ ${pat} != "" ]] \
+        [[ ${pat} != "" ]] && \
+        [[ ${organization} != "" ]] && \
+        [[ ${project} != "" ]] \
     } || { log_error "Function argument missing"; }
 
     export AZURE_DEVOPS_EXT_PAT="${pat}"
 
     az devops project list >/dev/null 2>&1 || { log_error "Given PAT is not valid"; }
 
-    log_info "Set Azure DevOps PAT finished successfully"
+    az devops configure --defaults organization="${organization}" project="${project}"
+
+    log_info "Login to Azure DevOps finished successfully"
 }
 
 # Set or create an Azure DevOps pipeline variable
 function azdo_pipeline_set_var() {
-
-    log_info "Setting AZDO var '${var_name}'"
 
     # defaults
     local var_name=""
