@@ -223,6 +223,7 @@ function iaac_run() {
   log_info "[LOG] Action: ${action}"
   log_info "[LOG] File variables: ${FILE_variables}"
   log_info "[LOG] File variables backend: ${FILE_variables_backend}"
+  log_info "[LOG] Skip refresh: ${skip_refresh}"
   log_info "[LOG] Skip apply: ${skip_apply}"
   log_info "[LOG] Skip cleanup: ${skip_cleanup}"
   log_info "[LOG] Skip init: ${skip_init}"
