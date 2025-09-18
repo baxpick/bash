@@ -300,10 +300,10 @@ function iaac_run() {
         -refresh-only \
         -var-file="${FILE_variables}" \
         -out "temp.plan"
+      log_info "Plan completed successfully"
     else
       log_info "Plan skipped"
     fi
-    log_info "Plan completed successfully"
     (echo >&2)  
 
     log_info "Plan+Apply... (real)"
