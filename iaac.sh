@@ -291,14 +291,14 @@ function iaac_run() {
     # sync local state if drift was made
     log_info "Plan... (refresh only)"
     if [[ "${skip_refresh}" == "NO" ]]; then
-    run ${TOOL} plan \
-      -var "environment=${environment}" \
-      -var "action=${action}" \
-      -var "my_ip=${my_ip}" \
-      -input=false \
-      -refresh-only \
-      -var-file="${FILE_variables}" \
-      -out "temp.plan"
+      run ${TOOL} plan \
+        -var "environment=${environment}" \
+        -var "action=${action}" \
+        -var "my_ip=${my_ip}" \
+        -input=false \
+        -refresh-only \
+        -var-file="${FILE_variables}" \
+        -out "temp.plan"
     else
       log_info "Plan skipped"
     fi
