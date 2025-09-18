@@ -98,6 +98,7 @@ function iaac_run() {
   local action=""
   local FILE_variables=""
   local FILE_variables_backend=""
+  local skip_refresh="NO"
   local skip_apply="YES"
   local skip_cleanup="NO"
   local skip_init="NO"
@@ -130,6 +131,11 @@ function iaac_run() {
           ;;
           --fileVarsBackend)
           FILE_variables_backend="$2"
+          shift
+          shift
+          ;;
+          --skipRefresh)
+          skip_refresh="$2"
           shift
           shift
           ;;
@@ -171,7 +177,11 @@ function iaac_run() {
     [[ "${action}" != "" ]] && \
     [[ "${FILE_variables}" != "" ]] && \
     [[ "${FILE_variables_backend}" != "" ]] && \
+    [[ "${skip_refresh}" != "" ]] && \
     [[ "${skip_apply}" != "" ]] && \
+    [[ "${skip_cleanup}" != "" ]] && \
+    [[ "${skip_init}" != "" ]] && \
+    [[ "${skip_validate}" != "" ]] && \
     [[ "${my_ip}" != "" ]] \
   } || { log_error "Function argument missing"; }
   
@@ -194,6 +204,8 @@ function iaac_run() {
   log_info "Sanity check completed successfully"
   (echo >&2)
 
+  [[ "${skip_refresh}" == "YES" ]] || [[ "${skip_refresh}" == "NO" ]] || \
+    { log_error "Invalid skip_refresh - must be 'YES' or 'NO'"; }
   [[ "${skip_apply}" == "YES" ]] || [[ "${skip_apply}" == "NO" ]] || \
     { log_error "Invalid skip_apply - must be 'YES' or 'NO'"; }
   [[ "${skip_cleanup}" == "YES" ]] || [[ "${skip_cleanup}" == "NO" ]] || \
@@ -278,6 +290,7 @@ function iaac_run() {
 
     # sync local state if drift was made
     log_info "Plan... (refresh only)"
+    if [[ "${skip_refresh}" == "NO" ]]; then
     run ${TOOL} plan \
       -var "environment=${environment}" \
       -var "action=${action}" \
@@ -286,17 +299,11 @@ function iaac_run() {
       -refresh-only \
       -var-file="${FILE_variables}" \
       -out "temp.plan"
+    else
+      log_info "Plan skipped"
+    fi
     log_info "Plan completed successfully"
-    (echo >&2)
-
-  #   log_info "Apply... (refresh only)"
-  #   run ${TOOL} apply \
-  #     -auto-approve \
-  #     -input=false \
-  #     -refresh-only \
-  #     "temp.plan"
-  #   log_info "Apply completed successfully"
-  #   (echo >&2)
+    (echo >&2)  
 
     log_info "Plan+Apply... (real)"
     if [[ "${skip_apply}" == "NO" ]]; then
