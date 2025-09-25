@@ -65,9 +65,9 @@ function azdo_login() {
 
     export AZURE_DEVOPS_EXT_PAT="${pat}"
 
-    az devops project list >/dev/null 2>&1 || { log_error "Given PAT is not valid"; }
-
     az devops configure --defaults organization="${organization}" project="${project}"
+
+    az devops project list >/dev/null 2>&1 || { log_error "Given PAT is not valid"; }
 
     log_info "Login to Azure DevOps finished successfully"
 }
