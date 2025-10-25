@@ -79,8 +79,7 @@ function azure_login() {
             if [[ ! -f "${CLIENT_CERT_PATH}" ]]; then
                 log_error "Certificate file not found: ${CLIENT_CERT_PATH}"
             fi
-            log_info "Using certificate-based authentication (MFA compliant)"
-            # Use --certificate flag for cert auth, not --password/-p
+
             az login --service-principal \
                 --username ${CLIENT_ID} \
                 --certificate ${CLIENT_CERT_PATH} \
@@ -88,8 +87,8 @@ function azure_login() {
     
         # Client secret authentication (legacy, not MFA compliant)
         elif [[ ${CLIENT_SECRET} != "" ]]; then
-            log_warn "⚠️  Using client secret auth (not MFA compliant, will be restricted Oct 2025)"
-            # Use --password flag for secret auth
+            log_warn "Using client secret auth (not MFA compliant)"
+
             az login --service-principal \
                 --username ${CLIENT_ID} \
                 --password ${CLIENT_SECRET} \
