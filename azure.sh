@@ -32,6 +32,7 @@ function azure_login() {
     # defaults
     local CLIENT_ID=""
     local CLIENT_SECRET=""
+    local CLIENT_CERT_PATH=""
     local TENANT_ID=""
 
     # Parse named arguments
@@ -48,6 +49,11 @@ function azure_login() {
             shift
             shift
             ;;
+            --clientCertPath)
+            CLIENT_CERT_PATH="$2"
+            shift
+            shift
+            ;;
             --tenantId)
             TENANT_ID="$2"
             shift
@@ -56,16 +62,36 @@ function azure_login() {
         esac
     done
 
+    # Validate required arguments
     { \
         [[ ${CLIENT_ID} != "" ]] && \
-        [[ ${CLIENT_SECRET} != "" ]] && \
-        [[ ${TENANT_ID} != "" ]] \
-    } || { log_error "Function argument missing"; }
+        [[ ${TENANT_ID} != "" ]] && \
+        { [[ ${CLIENT_SECRET} != "" ]] || [[ ${CLIENT_CERT_PATH} != "" ]]; } \
+    } || { log_error "Function argument missing: clientId, tenantId, and either clientSecret or clientCertPath required"; }
 
     ensure_command "az"
 
+    # Check if already logged in
     if ! az account show >/dev/null 2>&1; then
-        az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID} >/dev/null 2>&1
+
+        # Certificate-based authentication (MFA compliant)
+        if [[ ${CLIENT_CERT_PATH} != "" ]]; then
+            if [[ ! -f "${CLIENT_CERT_PATH}" ]]; then
+                log_error "Certificate file not found: ${CLIENT_CERT_PATH}"
+            fi
+            log_info "Using certificate-based authentication (MFA compliant)"
+            az login --service-principal \
+                -u ${CLIENT_ID} \
+                -p ${CLIENT_CERT_PATH} \
+                --tenant ${TENANT_ID} >/dev/null 2>&1
+    
+        # Client secret authentication (legacy, not MFA compliant) TODO: remove!
+        elif [[ ${CLIENT_SECRET} != "" ]]; then
+            az login --service-principal \
+                -u ${CLIENT_ID} \
+                -p ${CLIENT_SECRET} \
+                --tenant ${TENANT_ID} >/dev/null 2>&1
+        fi
     fi
 
     run az account show || { log_error "You are not signed in to Azure"; }
