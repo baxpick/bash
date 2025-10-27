@@ -80,6 +80,17 @@ function azure_login() {
         echo "${ARM_CLIENT_CERT_BASE64}" |base64 -d >"${CLIENT_CERT_PATH}"
         chmod 600 "${CLIENT_CERT_PATH}"
 
+        # convert .pem to .pfx
+        # REMARK: tofu needs this in ARM_CLIENT_CERTIFICATE_PATH variable
+        openssl pkcs12 \
+            -export \
+            -out $(dirname "${ARM_CLIENT_CERT_PATH}")/azure-sp.pfx \
+            -in "${ARM_CLIENT_CERT_PATH}" \
+            -passout pass: \
+            -macalg sha1 \
+            -keypbe PBE-SHA1-3DES \
+            -certpbe PBE-SHA1-3DES
+
         az login --service-principal \
             --username ${CLIENT_ID} \
             --certificate "${CLIENT_CERT_PATH}" \
