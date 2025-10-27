@@ -31,8 +31,8 @@ function azure_login() {
 
     # defaults
     local CLIENT_ID=""
-    local CLIENT_SECRET=""
     local CLIENT_CERT_PATH=""
+    local CLIENT_CERT_BASE64=""
     local TENANT_ID=""
 
     # Parse named arguments
@@ -44,13 +44,13 @@ function azure_login() {
             shift
             shift
             ;;
-            --clientSecret)
-            CLIENT_SECRET="$2"
+            --clientCertPath)
+            CLIENT_CERT_PATH="$2"
             shift
             shift
             ;;
-            --clientCertPath)
-            CLIENT_CERT_PATH="$2"
+            --clientCertBase64)
+            CLIENT_CERT_BASE64="$2"
             shift
             shift
             ;;
@@ -66,34 +66,24 @@ function azure_login() {
     { \
         [[ ${CLIENT_ID} != "" ]] && \
         [[ ${TENANT_ID} != "" ]] && \
-        { [[ ${CLIENT_SECRET} != "" ]] || [[ ${CLIENT_CERT_PATH} != "" ]]; } \
-    } || { log_error "Function argument missing: clientId, tenantId, and either clientSecret or clientCertPath required"; }
+        [[ ${CLIENT_CERT_PATH} != "" ]] && \
+        [[ ${CLIENT_CERT_BASE64} != "" ]] \
+    } || { log_error "Function argument missing"; }
 
     ensure_command "az"
 
     # Check if already logged in
     if ! az account show >/dev/null 2>&1; then
 
-        # Certificate-based authentication (MFA compliant)
-        if [[ ${CLIENT_CERT_PATH} != "" ]]; then
-            if [[ ! -f "${CLIENT_CERT_PATH}" ]]; then
-                log_error "Certificate file not found: ${CLIENT_CERT_PATH}"
-            fi
+        mkdir -p "$(dirname "${CLIENT_CERT_PATH}")" >/dev/null 2>&1 || true
 
-            az login --service-principal \
-                --username ${CLIENT_ID} \
-                --certificate ${CLIENT_CERT_PATH} \
-                --tenant ${TENANT_ID} >/dev/null 2>&1
-    
-        # Client secret authentication (legacy, not MFA compliant)
-        elif [[ ${CLIENT_SECRET} != "" ]]; then
-            log_warn "Using client secret auth (not MFA compliant)"
+        echo "${ARM_CLIENT_CERT_BASE64}" |base64 -d >"${CLIENT_CERT_PATH}"
+        chmod 600 "${CLIENT_CERT_PATH}"
 
-            az login --service-principal \
-                --username ${CLIENT_ID} \
-                --password ${CLIENT_SECRET} \
-                --tenant ${TENANT_ID} >/dev/null 2>&1
-        fi
+        az login --service-principal \
+            --username ${CLIENT_ID} \
+            --certificate "${CLIENT_CERT_PATH}" \
+            --tenant ${TENANT_ID} >/dev/null 2>&1
     fi
 
     run az account show || { log_error "You are not signed in to Azure"; }
