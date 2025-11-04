@@ -106,7 +106,7 @@ function gh_repo_set_var() {
     log_info "Setting GH var '${var_name}'"
 
     local gh_cmd="gh secret set"
-p    if [[ "${var_secret}" != "true" ]]; then
+    if [[ "${var_secret}" != "true" ]]; then
         gh_cmd="gh variable set"
     fi
 
