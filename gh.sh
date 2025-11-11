@@ -16,10 +16,13 @@ fi
 source "${FOLDER_bash}/system.sh"
 source "${FOLDER_bash}/logging.sh"
 
-# sanity
-# ######
+# sanity / dependencies
+# #####################
 
-ensure_command gh
+ensure_debian
+debian_apt_update
+
+debian_apt_install gh
 
 # functions
 # #########

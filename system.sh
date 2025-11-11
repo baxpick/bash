@@ -54,7 +54,16 @@ function debian_apt_update() {
 
 function debian_apt_install() {
     ensure_debian
-    run ${SUDO} apt-get install -y "$@"
+
+    if [[ "$1" == "" ]] || [[ "$2" != "" ]]; then
+        log_error "Only one package installation at a time is supported"
+    fi
+
+    log_info "Dependency: $1..."
+    if ! command -v "$1" >/dev/null 2>&1; then
+        run ${SUDO} apt-get install -y "$1"
+    fi
+    ensure_command "$1"
 }
 
 function get_cpu_cores() {
