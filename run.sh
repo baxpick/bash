@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Single entry point script
+# Single entry point script for iaac operations
 
 # absolute path to root folder
 if [[ "${FOLDER_ROOT}" == "" ]]; then

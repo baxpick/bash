@@ -13,13 +13,27 @@ fi
 # includes
 # ########
 
-source "${FOLDER_bash}/sanity.sh"
+source "${FOLDER_bash}/system.sh"
 source "${FOLDER_bash}/logging.sh"
 
-# sanity
-# ######
+# sanity / dependencies
+# #####################
+
+ensure_debian
+debian_apt_update
+
+if ! command -v az >/dev/null 2>&1; then
+    log_info "Azure CLI not found, attempting to install..."
+    
+    if ! command -v curl &> /dev/null; then
+        debian_apt_install curl
+    fi
+    
+    curl -sL https://aka.ms/InstallAzureCLIDeb |${SUDO} bash
+fi
 
 ensure_command az
+run az extension add --name azure-devops
 ensure_command jq
 
 # functions

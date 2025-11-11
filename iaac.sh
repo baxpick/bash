@@ -16,7 +16,7 @@ fi
 # includes
 # ########
 
-source "${FOLDER_bash}/sanity.sh"
+source "${FOLDER_bash}/system.sh"
 source "${FOLDER_bash}/logging.sh"
 source "${FOLDER_bash}/files.sh"
 source "${FOLDER_bash}/azure.sh"
