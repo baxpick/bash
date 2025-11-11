@@ -22,18 +22,25 @@ source "${FOLDER_bash}/logging.sh"
 ensure_debian
 debian_apt_update
 
+# Azure CLI
+log_info "Dependency: Azure CLI..."
 if ! command -v az >/dev/null 2>&1; then
-    log_info "Azure CLI not found, attempting to install..."
-    
     if ! command -v curl &> /dev/null; then
         debian_apt_install curl
     fi
     
     curl -sL https://aka.ms/InstallAzureCLIDeb |${SUDO} bash
 fi
-
 ensure_command az
-run az extension add --name azure-devops
+if ! az extension show --name "azure-devops" >/dev/null 2>&1; then
+    run az extension add --name azure-devops
+fi
+
+# jq
+log_info "Dependency: jq..."
+if ! command -v jq >/dev/null 2>&1; then
+    debian_apt_install jq
+fi
 ensure_command jq
 
 # functions

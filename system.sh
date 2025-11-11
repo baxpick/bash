@@ -19,7 +19,7 @@ source "${FOLDER_bash}/logging.sh"
 # #########
 
 SUDO=""
-if command -v sudo; then
+if command -v sudo >/dev/null 2>&1; then
     SUDO=sudo
 fi
 
