@@ -21,6 +21,42 @@ source "${FOLDER_bash}/logging.sh"
 source "${FOLDER_bash}/files.sh"
 source "${FOLDER_bash}/azure.sh"
 
+# sanity / dependencies
+# #####################
+
+ensure_debian
+debian_apt_update
+
+debian_apt_install git
+
+if [[ "${TOOL}" == "terraform" ]]; then
+  log_info "Dependency: terraform..."
+  MY_TERRAFORM_VERSION=1.11.4
+  if ! command -v terraform >/dev/null 2>&1; then
+    git clone https://github.com/tfutils/tfenv.git ~/.tfenv >/dev/null 2>&1
+    export PATH="${HOME}/.tfenv/bin:${PATH}" >/dev/null 2>&1
+    tfenv install ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
+    tfenv use ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
+  fi
+  ensure_command terraform
+  terraform --version
+
+elif [[ "${TOOL}" == "tofu" ]]; then
+  log_info "Dependency: tofu..."
+  debian_apt_install apt-transport-https
+  debian_apt_install ca-certificates
+  debian_apt_install curl
+  debian_apt_install gnupg
+  curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh >/dev/null 2>&1
+  chmod +x install-opentofu.sh > /dev/null 2>&1
+  ${SUDO} ./install-opentofu.sh --install-method deb >/dev/null 2>&1
+  rm -f install-opentofu.sh >/dev/null 2>&1
+  ensure_command tofu
+  tofu --version # Verify installation
+else
+  log_error "Invalid IAAC_TOOL '${TOOL}'"
+fi
+
 # functions
 # #########
 
