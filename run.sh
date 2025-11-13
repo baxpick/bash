@@ -172,15 +172,14 @@ for v in "${export_vars[@]}"; do
   export "${v}"
 done
 
-log_title "MAIN EXECUTION"
-# ########################
-
 # run pre-execution script if provided
 if [[ -n "${before_script}" ]]; then
     log_box "Running pre-execution script: ${before_script}"
     [[ -x "${before_script}" ]] || log_error "Pre-exec script not executable/found: ${before_script}"
     "${before_script}"
 fi
+
+log_box "MAIN EXECUTION"
 
 declare -a TF_ACTIONS=("resourcesCreate" "resourcesDelete")
 
