@@ -434,3 +434,19 @@ function azure_resource_close() {
 
   log_info "Close azure resource access completed successfully"
 }
+
+# MAIN
+# ####
+
+# AZURE LOGIN
+if ! command -v az >/dev/null || \
+    [ -z "${ARM_CLIENT_ID}" ] || \
+    [ -z "${ARM_CLIENT_CERT_PATH}" ] || \
+    [ -z "${ARM_CLIENT_CERT_BASE64}" ] || \
+    [ -z "${ARM_TENANT_ID}" ] || \
+    [ -z "${ARM_SUBSCRIPTION_ID}" ]; then
+
+    log_warning "[AZURE LOGIN] AZURE CLI login can not be performed."
+else 
+    azure_login --clientId ${ARM_CLIENT_ID} --clientCertPath ${ARM_CLIENT_CERT_PATH} --clientCertBase64 ${ARM_CLIENT_CERT_BASE64} --tenantId ${ARM_TENANT_ID} && \
+fi

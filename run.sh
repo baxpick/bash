@@ -14,7 +14,6 @@ export FOLDER_bash="${FOLDER_ROOT}/bash"
 source "${FOLDER_bash}/logging.sh"
 source "${FOLDER_bash}/iaac.sh"
 source "${FOLDER_bash}/azure.sh"
-source "${FOLDER_bash}/aws.sh"
 
 [[ "${LOG_VERBOSE}" == "YES" ]] || { log_warning "NOTE: for more detailed output, export LOG_VERBOSE=YES"; }
 
@@ -122,9 +121,6 @@ log_info "skip='${skip_arg}'"
 
 log_title "SANITY"
 # ################
-
-azure_login --clientId ${ARM_CLIENT_ID} --clientCertPath ${ARM_CLIENT_CERT_PATH} --clientCertBase64 ${ARM_CLIENT_CERT_BASE64} --tenantId ${ARM_TENANT_ID}
-aws_login --accessKeyId ${AWS_ACCESS_KEY_ID} --secretAccessKey ${AWS_SECRET_ACCESS_KEY} --defaultRegion ${AWS_DEFAULT_REGION}
 
 log_info "subscription..."
 [[ ! -z "${ARM_SUBSCRIPTION_ID}" ]] || { log_error "Subscription id not set"; }

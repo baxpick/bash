@@ -153,3 +153,17 @@ function aws_update_nameservers_from_azure_dns_zone() {
 
     log_info "Updating aws name servers from azure dns zone initiated successfully"
 }
+
+# MAIN
+# ####
+
+# AWS LOGIN
+if ! command -v aws >/dev/null || \
+    [ -z "${AWS_ACCESS_KEY_ID}" ] || \
+    [ -z "${AWS_SECRET_ACCESS_KEY}" ] || \
+    [ -z "${AWS_DEFAULT_REGION}" ]; then
+
+    log_warning "[AWS LOGIN] AWS CLI login can not be performed."
+else
+    aws_login --accessKeyId ${AWS_ACCESS_KEY_ID} --secretAccessKey ${AWS_SECRET_ACCESS_KEY} --defaultRegion ${AWS_DEFAULT_REGION}
+fi
