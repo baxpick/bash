@@ -448,5 +448,5 @@ if ! command -v az >/dev/null || \
 
     log_warning "[AZURE LOGIN] AZURE CLI login can not be performed."
 else 
-    azure_login --clientId ${ARM_CLIENT_ID} --clientCertPath ${ARM_CLIENT_CERT_PATH} --clientCertBase64 ${ARM_CLIENT_CERT_BASE64} --tenantId ${ARM_TENANT_ID} && \
+    azure_login --clientId ${ARM_CLIENT_ID} --clientCertPath ${ARM_CLIENT_CERT_PATH} --clientCertBase64 ${ARM_CLIENT_CERT_BASE64} --tenantId ${ARM_TENANT_ID}
 fi
