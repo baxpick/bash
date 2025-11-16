@@ -19,9 +19,23 @@ source "${FOLDER_bash}/logging.sh"
 # sanity
 # ######
 
+# sanity / dependencies
+# #####################
+
+ensure_debian
+debian_apt_update
+
+debian_apt_install curl
+
+log_info "Dependency: Azure CLI..."
+if ! command -v az >/dev/null 2>&1; then
+    curl -sL https://aka.ms/InstallAzureCLIDeb |${SUDO} bash
+fi
 ensure_command az
-az extension show --name azure-devops >/dev/null 2>&1 || \
-    { log_error "Azure DevOps extension for Azure CLI not installed. Please run 'az extension add --name azure-devops'"; }
+
+if ! az extension show --name "azure-devops" >/dev/null 2>&1; then
+    run az extension add --name azure-devops
+fi
 
 # functions
 # #########
@@ -140,3 +154,17 @@ function azdo_pipeline_set_var() {
 
     [[ $? -eq 0 ]] || { log_error "Setting AZDO var '${var_name}' failed"; }
 }
+
+# MAIN
+# ####
+
+# AZDO LOGIN
+if ! command -v az >/dev/null || \
+    [ -z "${AZDO_TOKEN}" ] || \
+    [ -z "${AZDO_PIPELINE_ORGANIZATION}" ] || \
+    [ -z "${AZDO_PIPELINE_PROJECT}" ]; then
+
+    log_warning "[AZDO LOGIN] AZDO CLI login can not be performed."
+else 
+    azdo_login --pat "${AZDO_TOKEN}" --organization "${AZDO_PIPELINE_ORGANIZATION}" --project "${AZDO_PIPELINE_PROJECT}"
+fi
