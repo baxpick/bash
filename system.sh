@@ -55,15 +55,21 @@ function debian_apt_update() {
 function debian_apt_install() {
     ensure_debian
 
-    if [[ "$1" == "" ]] || [[ "$2" != "" ]]; then
+    local PACKAGE=$1
+    local COMMAND=$2 # optional command to check
+
+    if [[ "${PACKAGE}" == "" ]] || [[ "$3" != "" ]]; then
         log_error "Only one package installation at a time is supported"
     fi
 
-    log_info "Dependency: $1..."
-    if ! command -v "$1" >/dev/null 2>&1; then
-        run ${SUDO} apt-get install -y "$1"
+    # install
+    log_info "Dependency: ${PACKAGE}..."
+    run ${SUDO} apt-get install -y "${PACKAGE}"
+
+    # check installation
+    if [[ "${COMMAND}" != "" ]]; then
+        ensure_command "${COMMAND}"
     fi
-    ensure_command "$1"
 }
 
 function get_cpu_cores() {
