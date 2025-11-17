@@ -96,9 +96,10 @@ function azure_login() {
 
         # convert .pem to .pfx
         # REMARK: tofu needs this in ARM_CLIENT_CERTIFICATE_PATH variable
+        export ARM_CLIENT_CERTIFICATE_PATH=$(dirname "${ARM_CLIENT_CERT_PATH}")/azure-sp.pfx
         openssl pkcs12 \
             -export \
-            -out $(dirname "${ARM_CLIENT_CERT_PATH}")/azure-sp.pfx \
+            -out ${ARM_CLIENT_CERTIFICATE_PATH} \
             -in "${ARM_CLIENT_CERT_PATH}" \
             -passout pass: \
             -macalg sha1 \
