@@ -83,3 +83,17 @@ function get_cpu_cores() {
     fi
     echo "$cores"
 }
+
+function get_ip_address() {
+    local IP=""
+
+    ensure_command curl
+
+    IP=$(curl -s https://api.ipify.org)
+    [[ $IP =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] && \
+        IFS='.' read -ra O <<< "$IP" && \
+        ((O[0]<=255 && O[1]<=255 && O[2]<=255 && O[3]<=255)) || \
+        IP=""
+    
+    echo "$IP"
+}

@@ -14,6 +14,7 @@ export FOLDER_bash="${FOLDER_ROOT}/bash"
 source "${FOLDER_bash}/logging.sh"
 source "${FOLDER_bash}/iaac.sh"
 source "${FOLDER_bash}/azure.sh"
+source "${FOLDER_bash}/system.sh"
 
 [[ "${LOG_VERBOSE}" == "YES" ]] || { log_warning "NOTE: for more detailed output, export LOG_VERBOSE=YES"; }
 
@@ -149,7 +150,7 @@ location_backend=$(value_from --file ${TF_file_variables} --findKey location_bac
 log_info "location_backend=${location_backend}"
 
 log_info "my_ip..."
-my_ip=$(curl -s https://ipinfo.io/ip) || { log_error "Can not get ip"; }
+my_ip=$(get_ip_address)
 [[ ! -z "${my_ip}" ]] || { log_error "IP not set"; }
 log_info "my_ip=${my_ip}"
 
