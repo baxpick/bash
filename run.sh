@@ -173,7 +173,7 @@ done
 if [[ -n "${before_script}" ]]; then
     log_box "Running pre-execution script: ${before_script}"
     [[ -x "${before_script}" ]] || log_error "Pre-exec script not executable/found: ${before_script}"
-    "${before_script}"
+    source "${before_script}" || { log_error "Pre-exec script failed: ${before_script}"; }
 fi
 
 log_box "MAIN EXECUTION"
@@ -214,5 +214,5 @@ fi
 if [[ -n "${after_script}" ]]; then
     log_box "Running post-execution script: ${after_script}"
     [[ -x "${after_script}" ]] || log_error "Post-exec script not executable/found: ${after_script}"
-    "${after_script}"
+    source "${after_script}" || { log_error "Post-exec script failed: ${after_script}"; }
 fi
