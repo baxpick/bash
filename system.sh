@@ -49,7 +49,7 @@ function ensure_folder() {
 # other
 function debian_apt_update() {
     ensure_debian
-    run ${SUDO} apt-get update
+    ${SUDO} apt-get update >/dev/null 2>&1 || { log_error "Failed debian_apt_update"; }
 }
 
 function debian_apt_install() {
@@ -64,7 +64,7 @@ function debian_apt_install() {
 
     # install
     log_info "Dependency: ${PACKAGE}..."
-    run ${SUDO} apt-get install -y "${PACKAGE}"
+    ${SUDO} apt-get install -y "${PACKAGE}" >/dev/null 2>&1 || { log_error "Failed debian_apt_install"; }
 
     # check installation
     if [[ "${COMMAND}" != "" ]]; then
