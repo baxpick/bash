@@ -121,14 +121,25 @@ function aws_update_nameservers_from_azure_dns_zone() {
         AZURE_NS+=("${line%.}")
     done < <(echo "${AZURE_NS_UNPARSED}" | jq -r '.[]')
 
-    run aws route53domains update-domain-nameservers \
+    # Try to update nameservers, but handle duplicate request gracefully
+    if ! aws route53domains update-domain-nameservers \
         --region ${AWS_REGION} \
         --domain-name ${DOMAIN_NAME} \
         --nameservers \
             "Name=${AZURE_NS[3]}" \
             "Name=${AZURE_NS[2]}" \
             "Name=${AZURE_NS[1]}" \
-            "Name=${AZURE_NS[0]}"
+            "Name=${AZURE_NS[0]}" 2>&1 | tee /tmp/aws_ns_update.log; then
+        
+        # Check if error is due to duplicate request
+        if grep -q "DuplicateRequest" /tmp/aws_ns_update.log; then
+            log_warning "Nameserver update already in progress, skipping..."
+            return 0
+        else
+            log_error "Failed to update nameservers"
+            return 1
+        fi
+    fi
 
     if [[ "${WAIT_FOR_UPDATE}" == "YES" ]]; then
         local WAIT_ELAPSED=0
