@@ -63,3 +63,16 @@ function docker_clean_dangling_images() {
   log_title "Cleanup of dangling docker images"
   docker images --filter "dangling=true" -q |xargs -r docker rmi -f
 }
+
+function docker_delete_all() {
+  log_title "Cleanup of all docker resources"
+  
+  docker ps -q | xargs -r docker stop
+  docker ps -aq | xargs -r docker rm
+  docker images -q | xargs -r docker rmi -f
+  docker volume ls -q | xargs -r docker volume rm
+  docker network ls -q --filter type=custom | xargs -r docker network rm 2>/dev/null || true
+  
+  # Final cleanup
+  docker system prune -af --volumes
+}
