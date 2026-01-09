@@ -31,6 +31,10 @@ function ensure_debian() {
     [[ -f /etc/debian_version ]] || log_error "Only Debian systems are supported"
 }
 
+function ensure_macos() {
+    [[ "$(uname)" == "Darwin" ]] || log_error "Only macOS systems are supported"
+}
+
 function ensure_command() {
     [[ "${1}" != "" ]] || log_error "empty argument"
     command -v "${1}" >/dev/null 2>&1 || log_error "Command '${1}' not found"

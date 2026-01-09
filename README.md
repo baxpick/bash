@@ -12,7 +12,7 @@ source ${FOLDER_bash}/docker.sh
 and you can execute, for example:
 
 ```bash
-docker_restart --cpu 4 --memory 8
+docker_delete_all
 ```
 
- to restart docker to use 4 CPU cores and 8 GB of RAM.
+to delete all docker resources.

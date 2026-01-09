@@ -16,15 +16,48 @@ fi
 source "${FOLDER_bash}/system.sh"
 source "${FOLDER_bash}/logging.sh"
 
-# sanity
-# ######
+# sanity / dependencies
+# #####################
 
+ensure_debian
+debian_apt_update
+
+if ! command -v docker; then
+  log_info "Dependency: docker..."
+
+  # Add Docker's official GPG key:
+  debian_apt_install ca-certificates
+  debian_apt_install curl
+  ${SUDO} install -m 0755 -d /etc/apt/keyrings
+  ${SUDO} curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  ${SUDO} chmod a+r /etc/apt/keyrings/docker.asc
+
+  # Add the repository to Apt sources:
+  ${SUDO} tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+  debian_apt_update
+
+  # Install Docker Engine packages
+  debian_apt_install docker-ce
+  debian_apt_install docker-ce-cli
+  debian_apt_install containerd.io
+  debian_apt_install docker-buildx-plugin
+  debian_apt_install docker-compose-plugin
+fi
 ensure_command docker
 
 # functions
 # #########
 
-function docker_restart() {
+function docker_restart_colima() {
+    
+    ensure_macos
 
     # defaults
     local cpu=6
