@@ -436,6 +436,131 @@ function azure_resource_close() {
   log_info "Close azure resource access completed successfully"
 }
 
+
+function azure_fetch_tls_cert_and_key() {
+    log_info "Fetch TLS Certificates from Azure Key Vault..."
+
+    # defaults
+    local vault_name=""
+    local cert_name=""
+    local key_name=""
+    local certs_dir_output=""
+    local cert_name_output="combined_cert.pem"
+    local cert_key_output="privkey.pem"
+
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            --vaultName)
+            vault_name="$2"
+            shift
+            shift
+            ;;
+            --certName)
+            cert_name="$2"
+            shift
+            shift
+            ;;
+            --keyName)
+            key_name="$2"
+            shift
+            shift
+            ;;
+            --certsDirOutput)
+            certs_dir_output="$2"
+            shift
+            shift
+            ;;
+            --certNameOutput)
+            cert_name_output="$2"
+            shift
+            shift
+            ;;
+            --keyNameOutput)
+            key_name_output="$2"
+            shift
+            shift
+            ;;
+        esac
+    done
+
+    # Validate required arguments
+    { \
+        [[ ${vault_name} != "" ]] && \
+        [[ ${cert_name} != "" ]] && \
+        [[ ${key_name} != "" ]] && \
+        [[ ${certs_dir_output} != "" ]] && \
+        [[ ${cert_name_output} != "" ]] && \
+        [[ ${cert_key_output} != "" ]] \
+    } || { log_error "Function argument missing"; }
+
+    local cert_name_output_full="${certs_dir_output}/${cert_name_output}"
+    local cert_key_output_full="${certs_dir_output}/${cert_key_output}"
+
+    ensure_command "az"
+
+    # log_info "Fetching certificates with the following parameters:"
+    # log_info "Vault: ${vault_name}"
+    # log_info "Certificate: ${cert_name}"
+    # log_info "Private Key: ${key_name}"
+    # log_info "Certificates Directory: ${certs_dir_output}"
+    # log_info "Certificate Output Name: ${cert_name_output}"
+    # log_info "Private Key Output Name: ${cert_key_output}"
+
+    # Create certs directory
+    mkdir -p "${certs_dir_output}" || log_error "Failed to create certificates directory"
+
+    ensure_command az
+
+    # Fetch certificate
+    #log_info "Downloading certificate..."
+    az keyvault certificate download \
+        --vault-name "${vault_name}" \
+        --name "${cert_name}" \
+        --file "${cert_name_output_full}" \
+        --encoding PEM || log_error "Failed to download certificate from Key Vault"
+
+    # Fetch private key
+    #log_info "Downloading private key..."
+    az keyvault secret show \
+        --vault-name "${vault_name}" \
+        --name "${key_name}" \
+        --query value \
+        -o tsv > "${cert_key_output_full}" || log_error "Failed to download private key from Key Vault"
+
+    ensure_file "${cert_name_output_full}"
+    ensure_file "${cert_key_output_full}"
+
+    # chmod 600 "${cert_name_output_full}"
+    # chmod 600 "${cert_key_output_full}"
+
+    # Decode and convert private key to proper format
+    #log_info "Converting private key to proper PEM format..."
+    ensure_command "mktemp"
+    local privkey_temp=$(mktemp "${certs_dir_output}/privkey_temp.XXXXXX")
+    local privkey_decoded=$(mktemp "${certs_dir_output}/privkey_decoded.XXXXXX")
+    
+    # Azure Key Vault stores keys as base64, decode first
+    ensure_command "base64"
+    base64 -d < "${cert_key_output_full}" >"${privkey_decoded}"
+
+    # Convert to EC format
+    ensure_command "openssl"
+    openssl ec -in "${privkey_decoded}" -out "${privkey_temp}" 2>/dev/null || log_error "Failed to convert private key format"
+    mv "${privkey_temp}" "${cert_key_output_full}"
+    rm -f "${privkey_decoded}" >/dev/null 2>&1
+
+    chmod 600 "${cert_name_output_full}"
+    chmod 600 "${cert_key_output_full}"
+
+    # log_info "✅ Certificates fetched successfully"
+    # log_info "Certificate: ${cert_name_output_full}"
+    # log_info "Private Key: ${cert_key_output_full}"
+
+    log_info "Fetch TLS Certificates from Azure Key Vault done successfully"
+}
+
 # MAIN
 # ####
 
