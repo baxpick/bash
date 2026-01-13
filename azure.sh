@@ -513,6 +513,9 @@ function azure_fetch_tls_cert_and_key() {
 
     ensure_command az
 
+    rm "${cert_name_output_full}" >/dev/null 2>&1 || true
+    rm "${cert_key_output_full}" >/dev/null 2>&1 || true
+
     # Fetch certificate
     #log_info "Downloading certificate..."
     az keyvault certificate download \
