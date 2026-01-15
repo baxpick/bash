@@ -28,16 +28,36 @@ ensure_debian
 debian_apt_update
 
 debian_apt_install git
+debian_apt_install unzip
 
 if [[ "${TOOL}" == "terraform" ]]; then
   log_info "Dependency: terraform..."
   MY_TERRAFORM_VERSION=1.11.4
-  if ! command -v terraform >/dev/null 2>&1; then
-    git clone https://github.com/tfutils/tfenv.git ~/.tfenv >/dev/null 2>&1
-    export PATH="${HOME}/.tfenv/bin:${PATH}" >/dev/null 2>&1
-    tfenv install ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
-    tfenv use ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
+  
+  # Ensure tfenv exists
+  if [[ ! -d ~/.tfenv ]]; then
+    git clone https://github.com/tfutils/tfenv.git ~/.tfenv
   fi
+  
+  # Always ensure tfenv is in PATH
+  export PATH="${HOME}/.tfenv/bin:${PATH}"
+  
+  # Install version if not already installed or if binary is missing
+  if [[ ! -f ~/.tfenv/versions/${MY_TERRAFORM_VERSION}/terraform ]]; then
+    # Clean up corrupted installation if exists
+    rm -rf ~/.tfenv/versions/${MY_TERRAFORM_VERSION} >/dev/null 2>&1 || true
+    log_info "Installing Terraform ${MY_TERRAFORM_VERSION}..."
+    tfenv install ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
+    
+    # Verify installation succeeded
+    if [[ ! -f ~/.tfenv/versions/${MY_TERRAFORM_VERSION}/terraform ]]; then
+      log_error "Terraform installation failed"
+    fi
+  fi
+  
+  # Set the version
+  tfenv use ${MY_TERRAFORM_VERSION} >/dev/null 2>&1
+  
   ensure_command terraform
   terraform --version
 
