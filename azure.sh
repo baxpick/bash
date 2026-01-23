@@ -478,7 +478,7 @@ function azure_fetch_tls_cert_and_key() {
             shift
             ;;
             --keyNameOutput)
-            key_name_output="$2"
+            cert_key_output="$2"
             shift
             shift
             ;;
